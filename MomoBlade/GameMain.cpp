@@ -16,6 +16,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         ClearDrawScreen(); // 画面クリア
 
+
+
+
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
         if (CheckHitKey(KEY_INPUT_ESCAPE) == 1) break; // ESCキーが押されたら終了
