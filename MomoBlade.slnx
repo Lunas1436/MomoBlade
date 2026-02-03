@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="MomoBlade/MomoBlade.vcxproj" />
+  <Project Path="MomoBlade/MomoBlade.vcxproj" Id="36bb1bef-f0a4-4930-862a-fc64ac240081" />
 </Solution>
