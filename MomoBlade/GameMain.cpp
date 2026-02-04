@@ -1,5 +1,5 @@
-#include "GameMain.h"
 #include "DxLib.h"
+#include "GameMain.h"
 
 using namespace std;
 
@@ -18,8 +18,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     {
         ClearDrawScreen(); // 画面クリア
 
-        // 描画確認用
-        DrawGraph(WIDTH / 2, HEIGHT / 2, imgMomo, TRUE);
+        PlayerInput();
+
+        if (bJumpUp) {
+            Momo.vy -= JUMP_UP_POWER;
+        }
+        if (bJumpDown) {
+            Momo.vy += GRAVITEY;
+        }
+
+        Momo.y += Momo.vy;
+        if (Momo.y - Momo.height / 2 <= 200) { // とりあえず天井を200に設定 
+            bJumpUp = false;
+            bJumpDown = true;
+        }
+
+        if (bJumpDown && Momo.y + Momo.height / 2 >= HEIGHT - 300) { // 着地
+            Momo.y = HEIGHT - 300;
+            Momo.vy = 0;
+            IsGround = true;
+            bJumpDown = false;
+        }
+
+        DrawGraph(Momo.x - Momo.width / 2, Momo.y - Momo.height / 2, Momo.img, TRUE);
         
 
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
@@ -31,11 +52,56 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     return 0;
 }
 
-
 void Init()
 {
-    imgMomo = LoadGraph("Image/Momo.png");
+    // モモタロー
+    // 画像読込み
+    Momo.img = LoadGraph("Image/Momo.png");
+    if (Momo.img < 0) {
+        // 読込み失敗
+    }
 
+    // サイズ
+    GetGraphSize(Momo.img, &Momo.width, &Momo.height);
+
+    // 初期位置(画像の中心座標)
+    Momo.x = 100;
+    Momo.y = HEIGHT - 300;
+    // 初期速度
+    Momo.vx = 5;
+    Momo.vy = 0;
+
+    IsGround = true;
+}
+
+void PlayerInput()
+{
+    // →キー
+    if (CheckHitKey(KEY_INPUT_RIGHT)) {
+        Momo.x += Momo.vx;
+        if (Momo.x + Momo.width / 2 > WIDTH) {
+            Momo.x = WIDTH - Momo.width / 2;
+        }
+    }
+
+    // ←キー
+    if (CheckHitKey(KEY_INPUT_LEFT)) {
+        Momo.x -= Momo.vx;
+        if (Momo.x - Momo.width / 2 < 0 ) {
+            Momo.x = Momo.width / 2;
+        }
+    }
+
+    // スペースキー
+    if (CheckHitKey(KEY_INPUT_SPACE)) {
+        //if (IsGround) {
+        //    Momo.y = JUMP_POWER;
+        //    IsGround = false;
+        //}
+        if (!bJumpUp && !bJumpDown) {
+            bJumpUp = true;
+        }
+    }
 
 }
 
