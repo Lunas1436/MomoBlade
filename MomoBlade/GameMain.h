@@ -34,9 +34,11 @@ const float JUMP_UP_POWER = 0.8f;
 bool bJumpUp = false;
 bool bJumpDown = false;
 
+int nImgGround;
 
 // ÉÇÉÇÉ^ÉçÅ[
 CHARACTER Momo;
 
 void Init();
+void DrawStage();
 void PlayerInput();

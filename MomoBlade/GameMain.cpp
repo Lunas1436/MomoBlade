@@ -40,8 +40,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             bJumpDown = false;
         }
 
+        // モモ描画
         DrawGraph(Momo.x - Momo.width / 2, Momo.y - Momo.height / 2, Momo.img, TRUE);
         
+        // 地面描画確認用
+        DrawStage();
 
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
@@ -61,6 +64,11 @@ void Init()
         // 読込み失敗
     }
 
+    nImgGround = LoadGraph("Image/Ground.png");
+    if (nImgGround < 0) {
+        // 読込み失敗
+    }
+
     // サイズ
     GetGraphSize(Momo.img, &Momo.width, &Momo.height);
 
@@ -71,8 +79,16 @@ void Init()
     Momo.vx = 5;
     Momo.vy = 0;
 
-    IsGround = true;
 }
+
+void DrawStage()
+{
+    // 地面描画
+    for (int i = 0; i < 30; i++) {
+        DrawGraph(i * 64, HEIGHT - 300 + Momo.height / 2, nImgGround, TRUE);
+    }
+}
+
 
 void PlayerInput()
 {
