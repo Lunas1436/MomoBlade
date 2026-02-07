@@ -5,7 +5,7 @@ using namespace std;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    SetWindowText("MOMO BLADE"); // ウィンドウのタイトル
+    SetWindowText("ObjMomo BLADE"); // ウィンドウのタイトル
     SetGraphMode(WIDTH, HEIGHT, 32); // ウィンドウの大きさとカラービット数の指定
     ChangeWindowMode(TRUE); // ウィンドウモードで起動
     if (DxLib_Init() == -1) return -1; // ライブラリ初期化 エラーが起きたら終了
@@ -21,30 +21,30 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         PlayerInput();
 
         if (bJumpUp) {
-            Momo.vy -= JUMP_UP_POWER;
+            ObjMomo.vy -= JUMP_UP_POWER;
         }
         if (bJumpDown) {
-            Momo.vy += GRAVITEY;
+            ObjMomo.vy += GRAVITEY;
         }
 
-        Momo.y += Momo.vy;
-        if (Momo.y - Momo.height / 2 <= 200) { // とりあえず天井を200に設定 
+        ObjMomo.y += ObjMomo.vy;
+        if (ObjMomo.y - ObjMomo.height / 2 <= 200) { // とりあえず天井を200に設定 
             bJumpUp = false;
             bJumpDown = true;
         }
 
-        if (bJumpDown && Momo.y + Momo.height / 2 >= HEIGHT - 300) { // 着地
-            Momo.y = HEIGHT - 300;
-            Momo.vy = 0;
-            IsGround = true;
+        if (bJumpDown && ObjMomo.y + ObjMomo.height >= ObjGround.y) { // 着地
+            ObjMomo.y = ObjGround.y - ObjMomo.height;
+            ObjMomo.vy = 0;
             bJumpDown = false;
         }
+        
+        // ステージ描画
+        DrawStage();
 
         // モモ描画
-        DrawGraph(Momo.x - Momo.width / 2, Momo.y - Momo.height / 2, Momo.img, TRUE);
-        
-        // 地面描画確認用
-        DrawStage();
+        DrawGraph(ObjMomo.x, ObjMomo.y, ObjMomo.img, TRUE);
+       
 
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
@@ -57,35 +57,71 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void Init()
 {
+    // ステージ
+    // 空
+    ObjSky.img = LoadGraph("Image/Sky.png");
+    if (ObjSky.img < 0) {
+        // 読込み失敗
+    }
+    GetGraphSize(ObjSky.img, &ObjSky.width, &ObjSky.height);
+    ObjSky.x = 0;
+    ObjSky.y = 0;
+    ObjSky.vx = 0.5f; // 雲の移動速度
+    ObjSky.vy = 0;
+
+    // 地面
+    ObjGround.img = LoadGraph("Image/Ground.png");
+    if (ObjGround.img < 0) {
+        // 読込み失敗
+    }
+    GetGraphSize(ObjGround.img, &ObjGround.width, &ObjGround.height);
+    ObjGround.x = 0;
+    ObjGround.y = HEIGHT - ObjGround.height * 3; // HEIGHT - 192
+
+    // 地中
+    ObjUnderGround.img = LoadGraph("Image/UnderGround.png");
+    if (ObjUnderGround.img < 0) {
+        // 読込み失敗
+    }
+    GetGraphSize(ObjUnderGround.img, &ObjUnderGround.width, &ObjUnderGround.height);
+    ObjUnderGround.x = ObjGround.x;
+    ObjUnderGround.y = ObjGround.y + ObjGround.height;
+    
+
     // モモタロー
-    // 画像読込み
-    Momo.img = LoadGraph("Image/Momo.png");
-    if (Momo.img < 0) {
+    ObjMomo.img = LoadGraph("Image/Momo.png");
+    if (ObjMomo.img < 0) {
         // 読込み失敗
     }
-
-    nImgGround = LoadGraph("Image/Ground.png");
-    if (nImgGround < 0) {
-        // 読込み失敗
-    }
-
     // サイズ
-    GetGraphSize(Momo.img, &Momo.width, &Momo.height);
+    GetGraphSize(ObjMomo.img, &ObjMomo.width, &ObjMomo.height);
 
-    // 初期位置(画像の中心座標)
-    Momo.x = 100;
-    Momo.y = HEIGHT - 300;
+    // 初期座標(左上基準)
+    ObjMomo.x = 100;
+    ObjMomo.y = ObjGround.y - ObjMomo.height;
     // 初期速度
-    Momo.vx = 5;
-    Momo.vy = 0;
+    ObjMomo.vx = 5;
+    ObjMomo.vy = 0;
 
 }
 
+// ステージ描画
 void DrawStage()
 {
+    // 空描画
+    ObjSky.x += ObjSky.vx;
+    if (ObjSky.x >= WIDTH) {
+        ObjSky.x -= WIDTH;
+    }
+    DrawGraph(ObjSky.x - ObjSky.width, ObjSky.y, ObjSky.img, TRUE);
+    DrawGraph(ObjSky.x, ObjSky.y, ObjSky.img, TRUE);
+
     // 地面描画
     for (int i = 0; i < 30; i++) {
-        DrawGraph(i * 64, HEIGHT - 300 + Momo.height / 2, nImgGround, TRUE);
+        DrawGraph(i * ObjGround.width, ObjGround.y, ObjGround.img, TRUE);
+        for (int j = 0; j < 3; j++) {
+            DrawGraph(i * ObjUnderGround.width, ObjUnderGround.y + j * ObjUnderGround.height, ObjUnderGround.img, TRUE); // 地中描画
+        }
     }
 }
 
@@ -94,26 +130,22 @@ void PlayerInput()
 {
     // →キー
     if (CheckHitKey(KEY_INPUT_RIGHT)) {
-        Momo.x += Momo.vx;
-        if (Momo.x + Momo.width / 2 > WIDTH) {
-            Momo.x = WIDTH - Momo.width / 2;
+        ObjMomo.x += ObjMomo.vx;
+        if (ObjMomo.x + ObjMomo.width > WIDTH) {
+            ObjMomo.x = WIDTH - ObjMomo.width;
         }
     }
 
     // ←キー
     if (CheckHitKey(KEY_INPUT_LEFT)) {
-        Momo.x -= Momo.vx;
-        if (Momo.x - Momo.width / 2 < 0 ) {
-            Momo.x = Momo.width / 2;
+        ObjMomo.x -= ObjMomo.vx;
+        if (ObjMomo.x < 0 ) { 
+            ObjMomo.x = 0;
         }
     }
 
     // スペースキー
     if (CheckHitKey(KEY_INPUT_SPACE)) {
-        //if (IsGround) {
-        //    Momo.y = JUMP_POWER;
-        //    IsGround = false;
-        //}
         if (!bJumpUp && !bJumpDown) {
             bJumpUp = true;
         }
