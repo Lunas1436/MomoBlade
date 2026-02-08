@@ -1,7 +1,12 @@
 #pragma once
 
-const int HEIGHT = 600;
-const int WIDTH = 1000;
+// ステージ
+const int STAGE_WIDTH = 5000;
+const int STAGE_HEIGHT = 600;
+
+// スクリーン
+const int SCREEN_WIDTH = 1000;
+const int SCREEN_HEIGHT = 600;
 
 // ゲームステート
 enum {
@@ -36,8 +41,13 @@ const float GRAVITEY = 0.8f;
 const float JUMP_UP_POWER = 0.8f;
 bool bJumpUp = false;
 bool bJumpDown = false;
+int nCameraX = 0;
+
+OBJECT ObjEnemy;
 
 
-void Init();
+void InitData();
+void SetObjParameter(OBJECT* pObj, float fx, float fy, float fvx, float fvy, const char* pchImg);
+void CheckJumpState();
 void DrawStage();
 void PlayerInput();
