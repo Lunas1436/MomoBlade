@@ -35,6 +35,8 @@ OBJECT ObjSky;
 OBJECT ObjGround;      // 地面
 OBJECT ObjUnderGround; // 地中
 
+int nStageBGM; // ステージのBGM
+
 // モモタロー
 OBJECT ObjMomo;
 const float GRAVITEY = 0.8f;
@@ -43,6 +45,9 @@ bool bJumpUp = false;
 bool bJumpDown = false;
 int nCameraX = 0;
 
+OBJECT ObjSword; // 剣
+
+// 敵
 OBJECT ObjEnemy;
 
 

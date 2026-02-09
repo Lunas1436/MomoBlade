@@ -54,6 +54,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     return 0;
 }
 
+// 初期化
 void InitData()
 {
     // ステージ
@@ -73,8 +74,15 @@ void InitData()
     SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo.png");
     ObjMomo.y = ObjGround.y - ObjMomo.height;
 
+    // 剣
+    SetObjParameter(&ObjSword, 100, 0.0f, 5.0f, 0.0f, "Image/Sword.png");
+
     // 敵1
     SetObjParameter(&ObjEnemy, 2000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
+
+    // ステージBGM
+    nStageBGM = LoadSoundMem("Sound/StageBGM.wav");
+    PlaySoundMem(nStageBGM, DX_PLAYTYPE_LOOP);
 
 }
 
