@@ -39,6 +39,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // ƒ‚ƒ‚•`‰æ
         DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
 
+        // Œ••`‰æ
+        DrawGraph(ObjMomo.x + ObjMomo.width + 10, ObjMomo.y - 20, ObjSword.img, TRUE);
+
         // “G•`‰æŠm”F—p
         if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) {
             //DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
@@ -75,7 +78,7 @@ void InitData()
     ObjMomo.y = ObjGround.y - ObjMomo.height;
 
     // Œ•
-    SetObjParameter(&ObjSword, 100, 0.0f, 5.0f, 0.0f, "Image/Sword.png");
+    SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword.png");
 
     // “G1
     SetObjParameter(&ObjEnemy, 2000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
