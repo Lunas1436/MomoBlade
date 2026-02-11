@@ -15,6 +15,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // 初期化
     InitData();
 
+    // ステージのBGMをループ再生で流す
+    PlaySoundMem(nStageBGM, DX_PLAYTYPE_LOOP);
+
     while (1)
     {
         ClearDrawScreen(); // 画面クリア
@@ -40,12 +43,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
 
         // 剣描画
-        DrawGraph(ObjMomo.x + ObjMomo.width + 10, ObjMomo.y - 20, ObjSword.img, TRUE);
+        ObjSword.x = ObjMomo.x - nCameraX + ObjMomo.width + 10;
+        ObjSword.y = ObjMomo.y - 20;
+        SwordAttack();
+        DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
 
         // 敵描画確認用
         if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) {
-            //DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
-            DrawExtendGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.x - nCameraX + ObjEnemy.width * 1.5, ObjEnemy.y + ObjEnemy.height * 1.5, ObjEnemy.img, TRUE);
+            DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
         }
 
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
@@ -74,18 +79,24 @@ void InitData()
     ObjUnderGround.y = ObjGround.y + ObjUnderGround.height;
 
     // モモタロー
-    SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo.png");
+    SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo2.png");
     ObjMomo.y = ObjGround.y - ObjMomo.height;
 
     // 剣
-    SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword.png");
+    SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword2.png");
+    nAttackingTimer = 0;
+    bIsAttacking = false;
+    dSwordAngle = 0;
 
     // 敵1
     SetObjParameter(&ObjEnemy, 2000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
+    ObjEnemy.y += ObjEnemy.height / 2;
 
     // ステージBGM
     nStageBGM = LoadSoundMem("Sound/StageBGM.wav");
-    PlaySoundMem(nStageBGM, DX_PLAYTYPE_LOOP);
+
+    // 斬撃BGM
+    nSlashBGM = LoadSoundMem("Sound/SlashBGM.wav");
 
 }
 
@@ -129,6 +140,24 @@ void CheckJumpState()
     }
 }
 
+// 斬撃モーション
+void SwordAttack()
+{
+    if (bIsAttacking) {
+        nAttackingTimer+=10;
+        if (nAttackingTimer > 90) {
+            bIsAttacking = false;
+            nAttackingTimer = 0;
+            dSwordAngle = 0;
+            StopSoundMem(nSlashBGM, DX_PLAYTYPE_LOOP);
+            return;
+        }
+
+        PlaySoundMem(nSlashBGM, DX_PLAYTYPE_LOOP);
+        dSwordAngle = nAttackingTimer * (3.14 / 180);
+    }
+}
+
 // ステージ描画
 void DrawStage()
 {
@@ -155,9 +184,6 @@ void PlayerInput()
     // →キー
     if (CheckHitKey(KEY_INPUT_RIGHT)) {
         ObjMomo.x += ObjMomo.vx;
-        //if (ObjMomo.x + ObjMomo.width > SCREEN_WIDTH) {
-        //    ObjMomo.x = SCREEN_WIDTH - ObjMomo.width;
-        //}
     }
 
     // ←キー
@@ -170,9 +196,12 @@ void PlayerInput()
 
     // スペースキー
     if (CheckHitKey(KEY_INPUT_SPACE)) {
-        if (!bJumpUp && !bJumpDown) {
-            bJumpUp = true;
+        if (bIsAttacking == false) {
+            bIsAttacking = true;
         }
+        //if (!bJumpUp && !bJumpDown) {
+        //    bJumpUp = true;
+        //}
     }
 }
 

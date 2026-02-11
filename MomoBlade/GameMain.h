@@ -35,7 +35,9 @@ OBJECT ObjSky;
 OBJECT ObjGround;      // 地面
 OBJECT ObjUnderGround; // 地中
 
-int nStageBGM; // ステージのBGM
+// BGM
+int nStageBGM; // ステージ
+int nSlashBGM; // 斬撃
 
 // モモタロー
 OBJECT ObjMomo;
@@ -56,3 +58,8 @@ void SetObjParameter(OBJECT* pObj, float fx, float fy, float fvx, float fvy, con
 void CheckJumpState();
 void DrawStage();
 void PlayerInput();
+
+void SwordAttack(); // 剣攻撃
+bool bIsAttacking;
+int nAttackingTimer;
+double dSwordAngle = 0;
