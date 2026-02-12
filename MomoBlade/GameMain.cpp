@@ -1,6 +1,8 @@
 #include "DxLib.h"
 #include "GameMain.h"
 
+#include <cmath>
+
 using namespace std;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -20,7 +22,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     while (1)
     {
-        ClearDrawScreen(); // 画面クリア
+        // 画面クリア
+        ClearDrawScreen();
 
         // ステージ描画
         DrawStage();
@@ -42,16 +45,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // モモ描画
         DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
 
+        // 敵描画確認用
+        if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) {
+            if (nDamagingTimer == 0) {
+                DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
+            }
+        }
+
         // 剣描画
         ObjSword.x = ObjMomo.x - nCameraX + ObjMomo.width + 10;
         ObjSword.y = ObjMomo.y - 20;
         SwordAttack();
         DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
 
-        // 敵描画確認用
-        if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) {
-            DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
+        // ヒットチェック
+        if (bIsHit == false) { // 剣の先端が敵の矩形の中にあればヒット
+            if (HitCheckToEnemy()) {
+                bIsHit = true;
+                nDamagingTimer++;
+            }
         }
+
+        if (nDamagingTimer > 0) {
+            nDamagingTimer++;
+            DamageEnemy();
+            if (nDamagingTimer > 60) {
+                nDamagingTimer = 0;
+                bIsHit = false;
+            }
+        }
+        
 
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
@@ -84,6 +107,7 @@ void InitData()
 
     // 剣
     SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword2.png");
+    dSwordLength = ObjSword.width * 1.41;
     nAttackingTimer = 0;
     bIsAttacking = false;
     dSwordAngle = 0;
@@ -91,6 +115,10 @@ void InitData()
     // 敵1
     SetObjParameter(&ObjEnemy, 2000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
     ObjEnemy.y += ObjEnemy.height / 2;
+    // 敵1がダメージを受けたとき用
+    nDamagedEnemy = LoadGraph("Image/DamagedEnemy1.png");
+    bIsHit = false;
+    nDamagingTimer = 0;
 
     // ステージBGM
     nStageBGM = LoadSoundMem("Sound/StageBGM.wav");
@@ -145,7 +173,7 @@ void SwordAttack()
 {
     if (bIsAttacking) {
         nAttackingTimer+=10;
-        if (nAttackingTimer > 90) {
+        if (nAttackingTimer > 90) { // 斬撃モーション終了
             bIsAttacking = false;
             nAttackingTimer = 0;
             dSwordAngle = 0;
@@ -156,6 +184,35 @@ void SwordAttack()
         PlaySoundMem(nSlashBGM, DX_PLAYTYPE_LOOP);
         dSwordAngle = nAttackingTimer * (3.14 / 180);
     }
+}
+
+// 敵と剣先とのヒットチェック
+bool HitCheckToEnemy()
+{
+    // 剣先の座標
+    // 剣の画像の左下からの座標
+    double TipX = ObjSword.x + dSwordLength * cos(dSwordAngle);
+    double TipY = ObjSword.y + ObjSword.height + dSwordLength * sin(dSwordAngle);
+
+    // 剣先が敵矩形の中にあるか判定
+    if (TipX >= ObjEnemy.x - nCameraX && TipX <= ObjEnemy.x - nCameraX + ObjEnemy.width &&
+        TipY >= ObjEnemy.y && TipY <= ObjEnemy.y + ObjEnemy.height) {
+        return true;
+    }
+
+    return false;
+}
+
+// 敵がダメージを受けたときの演出
+void DamageEnemy()
+{
+    DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, nDamagedEnemy, TRUE); // 被ダメージの敵描画
+
+    // ダメージ演出
+    SetDrawBlendMode(DX_BLENDMODE_ADD, 255);   // 色を加算する設定
+    int col = GetColor(rand() % 256, rand() % 256, rand() % 256); // 確認用
+    DrawBox(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.x - nCameraX + ObjEnemy.width, ObjEnemy.y + ObjEnemy.height, col, TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // 通常の描画に戻す 
 }
 
 // ステージ描画
@@ -173,7 +230,6 @@ void DrawStage()
     for (int i = 0; i < STAGE_WIDTH / ObjGround.width; i++) {
         DrawGraph(i * ObjGround.width - nCameraX, ObjGround.y, ObjGround.img, TRUE); // 地面
         DrawGraph(i * ObjUnderGround.width - nCameraX, ObjGround.y + ObjGround.height, ObjUnderGround.img, TRUE); // 地中
-        int aaa = 100;
     }
 
 }
@@ -199,6 +255,7 @@ void PlayerInput()
         if (bIsAttacking == false) {
             bIsAttacking = true;
         }
+        // スペースキーを攻撃モーションに割り当ててるのでいったんコメントアウト
         //if (!bJumpUp && !bJumpDown) {
         //    bJumpUp = true;
         //}

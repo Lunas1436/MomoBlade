@@ -51,7 +51,10 @@ OBJECT ObjSword; // 剣
 
 // 敵
 OBJECT ObjEnemy;
-
+int nDamagedEnemy;
+//OBJECT ObjDamagedEnemy;
+void DamageEnemy();
+int nDamagingTimer;
 
 void InitData();
 void SetObjParameter(OBJECT* pObj, float fx, float fy, float fvx, float fvy, const char* pchImg);
@@ -59,7 +62,10 @@ void CheckJumpState();
 void DrawStage();
 void PlayerInput();
 
-void SwordAttack(); // 剣攻撃
+void SwordAttack();     // 斬撃モーション
+bool HitCheckToEnemy(); // 敵と剣先とのヒットチェック
+bool bIsHit = false;
+double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
 bool bIsAttacking;
 int nAttackingTimer;
 double dSwordAngle = 0;
