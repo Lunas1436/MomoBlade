@@ -28,6 +28,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // ステージ描画
         DrawStage();
 
+        // 確認用
+        DrawGraph(20, 20, nHP, TRUE);
+        DrawGraph(20 + 32*1 + 5, 20, nHP, TRUE);
+        DrawGraph(20 + 32*2 + 10, 20, nHP, TRUE);
+
         // プレイヤー入力
         PlayerInput();
 
@@ -46,7 +51,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
 
         // 敵描画確認用
-        if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) {
+        if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
             if (nDamagingTimer == 0) {
                 DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
             }
@@ -55,26 +60,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // 剣描画
         ObjSword.x = ObjMomo.x - nCameraX + ObjMomo.width + 10;
         ObjSword.y = ObjMomo.y - 20;
-        SwordAttack();
+        if (bIsAttacking) { // 斬撃モーション
+            SwordAttack();
+        }
         DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
 
         // ヒットチェック
         if (bIsHit == false) { // 剣の先端が敵の矩形の中にあればヒット
             if (HitCheckToEnemy()) {
                 bIsHit = true;
-                nDamagingTimer++;
+                //bDamaging = true;
             }
         }
 
-        if (nDamagingTimer > 0) {
+        // ダメージ演出
+        if (bIsHit) {
             nDamagingTimer++;
             DamageEnemy();
             if (nDamagingTimer > 60) {
                 nDamagingTimer = 0;
                 bIsHit = false;
+                //bDamaging = false;
             }
         }
-        
 
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
@@ -105,6 +113,9 @@ void InitData()
     SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo2.png");
     ObjMomo.y = ObjGround.y - ObjMomo.height;
 
+    nHP = LoadGraph("Image/HP.png");
+    
+
     // 剣
     SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword2.png");
     dSwordLength = ObjSword.width * 1.41;
@@ -113,7 +124,7 @@ void InitData()
     dSwordAngle = 0;
 
     // 敵1
-    SetObjParameter(&ObjEnemy, 2000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
+    SetObjParameter(&ObjEnemy, 1000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
     ObjEnemy.y += ObjEnemy.height / 2;
     // 敵1がダメージを受けたとき用
     nDamagedEnemy = LoadGraph("Image/DamagedEnemy1.png");
@@ -171,19 +182,17 @@ void CheckJumpState()
 // 斬撃モーション
 void SwordAttack()
 {
-    if (bIsAttacking) {
-        nAttackingTimer+=10;
-        if (nAttackingTimer > 90) { // 斬撃モーション終了
-            bIsAttacking = false;
-            nAttackingTimer = 0;
-            dSwordAngle = 0;
-            StopSoundMem(nSlashBGM, DX_PLAYTYPE_LOOP);
-            return;
-        }
-
-        PlaySoundMem(nSlashBGM, DX_PLAYTYPE_LOOP);
-        dSwordAngle = nAttackingTimer * (3.14 / 180);
+    nAttackingTimer += 10;
+    if (nAttackingTimer > 90) { // 斬撃モーション終了
+        bIsAttacking = false;
+        nAttackingTimer = 0;
+        dSwordAngle = 0;
+        StopSoundMem(nSlashBGM, DX_PLAYTYPE_LOOP);
+        return;
     }
+
+    PlaySoundMem(nSlashBGM, DX_PLAYTYPE_LOOP);
+    dSwordAngle = nAttackingTimer * (3.14 / 180);
 }
 
 // 敵と剣先とのヒットチェック

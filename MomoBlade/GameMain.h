@@ -46,6 +46,7 @@ const float JUMP_UP_POWER = 0.8f;
 bool bJumpUp = false;
 bool bJumpDown = false;
 int nCameraX = 0;
+int nHP;
 
 OBJECT ObjSword; // 剣
 
@@ -65,6 +66,7 @@ void PlayerInput();
 void SwordAttack();     // 斬撃モーション
 bool HitCheckToEnemy(); // 敵と剣先とのヒットチェック
 bool bIsHit = false;
+bool bDamaging = false;
 double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
 bool bIsAttacking;
 int nAttackingTimer;
