@@ -1,9 +1,14 @@
 #include "DxLib.h"
 #include "GameMain.h"
 
+#include <string>
 #include <cmath>
 
 using namespace std;
+
+// 確認用
+bool bIsHitToMomo = false;
+int nMomoDamagedTimer = 0;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -28,10 +33,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // ステージ描画
         DrawStage();
 
-        // 確認用
-        DrawGraph(20, 20, nHP, TRUE);
-        DrawGraph(20 + 32*1 + 5, 20, nHP, TRUE);
-        DrawGraph(20 + 32*2 + 10, 20, nHP, TRUE);
+        // HP確認用
+        DrawHP();
 
         // プレイヤー入力
         PlayerInput();
@@ -50,13 +53,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // モモ描画
         DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
 
-        // 敵描画確認用
-        if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
-            if (nDamagingTimer == 0) {
-                DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
-            }
-        }
-
         // 剣描画
         ObjSword.x = ObjMomo.x - nCameraX + ObjMomo.width + 10;
         ObjSword.y = ObjMomo.y - 20;
@@ -65,24 +61,47 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
         DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
 
+        // 敵描画確認用
+        if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
+            if (nDamagingTimer == 0) {
+                DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
+            }
+        }
+
         // ヒットチェック
         if (bIsHit == false) { // 剣の先端が敵の矩形の中にあればヒット
             if (HitCheckToEnemy()) {
                 bIsHit = true;
-                //bDamaging = true;
             }
         }
 
         // ダメージ演出
         if (bIsHit) {
             nDamagingTimer++;
-            DamageEnemy();
+            DamageToEnemy();
             if (nDamagingTimer > 60) {
                 nDamagingTimer = 0;
                 bIsHit = false;
-                //bDamaging = false;
             }
         }
+
+        // モモのダメージ計算
+        if (bIsHitToMomo == false) {
+            if (HitCheckToMomo()) {
+                bIsHitToMomo = true;
+                nCurrentHP--;
+            }
+        }
+
+        if (bIsHitToMomo) {
+            nMomoDamagedTimer++;
+            DamageToMomo();
+            if (nMomoDamagedTimer > 60) {
+                nMomoDamagedTimer = 0;
+                bIsHitToMomo = false;
+            }
+        }
+        
 
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
@@ -113,9 +132,18 @@ void InitData()
     SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo2.png");
     ObjMomo.y = ObjGround.y - ObjMomo.height;
 
-    nHP = LoadGraph("Image/HP.png");
-    
+    // HP
+    string strHPpath = "";
+    for (int i = 0; i < 5; i++) {
+        strHPpath = "Image/HP_" + std::to_string(i) + ".png";
+        nImgHP[i] = LoadGraph(strHPpath.c_str());
+    }
+    int nTempH = 0; 
+    GetGraphSize(nImgHP[0], &nHPWidth, &nTempH);
+    nHPX = 20, nHPY = 20; // とりあえずの座標
+    nCurrentHP = HP_MAX * 4;
 
+    
     // 剣
     SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword2.png");
     dSwordLength = ObjSword.width * 1.41;
@@ -153,6 +181,7 @@ void SetObjParameter(OBJECT *pObj, float fx, float fy, float fvx, float fvy, con
     pObj->vx = fvx;
     pObj->vy = fvy;
 }
+
 
 // ジャンプ状態チェック
 void CheckJumpState()
@@ -212,8 +241,30 @@ bool HitCheckToEnemy()
     return false;
 }
 
+// モモと敵とのヒットチェック
+bool HitCheckToMomo()
+{
+    int dx = abs((ObjMomo.x + ObjMomo.width / 2) - (ObjEnemy.x + ObjEnemy.width / 2));
+    int dy = abs((ObjMomo.y + ObjMomo.height / 2) - (ObjEnemy.y + ObjEnemy.height / 2));
+    if ((dx <= ObjMomo.width / 2 + ObjEnemy.width / 2) && (dy <= ObjMomo.height / 2 + ObjEnemy.height / 2)) {
+        return true;
+    }
+
+    return false;
+}
+
+// モモがダメージを受けたときの演出
+void DamageToMomo()
+{
+    // ダメージ演出
+    SetDrawBlendMode(DX_BLENDMODE_ADD, 255);   // 色を加算する設定
+    int col = GetColor(rand() % 256, rand() % 256, rand() % 256); // 確認用
+    DrawBox(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.x - nCameraX + ObjMomo.width, ObjMomo.y + ObjMomo.height, col, TRUE);
+    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // 通常の描画に戻す
+}
+
 // 敵がダメージを受けたときの演出
-void DamageEnemy()
+void DamageToEnemy()
 {
     DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, nDamagedEnemy, TRUE); // 被ダメージの敵描画
 
@@ -222,6 +273,33 @@ void DamageEnemy()
     int col = GetColor(rand() % 256, rand() % 256, rand() % 256); // 確認用
     DrawBox(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.x - nCameraX + ObjEnemy.width, ObjEnemy.y + ObjEnemy.height, col, TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // 通常の描画に戻す 
+}
+
+// HP更新
+void DrawHP()
+{
+    int nFullHP = nCurrentHP / 4;
+    int nLeftHP = nCurrentHP % 4;
+    int nNonHP = (HP_MAX * 4 - nCurrentHP) / 4;
+
+
+    int i = 0;
+    // フルHP
+    for (i = 0; i < nFullHP; i++) {
+        DrawGraph(nHPX + nHPWidth * i, nHPY, nImgHP[4], TRUE);
+    }
+
+    // 
+    if (nLeftHP > 0) {
+        DrawGraph(nHPX + nHPWidth * i, nHPY, nImgHP[nLeftHP], TRUE);
+        i++;
+    }
+
+    for (int j = 0; j < nNonHP; j++) {
+        DrawGraph(nHPX + nHPWidth * (i + j), nHPY, nImgHP[0], TRUE);
+
+    }
+
 }
 
 // ステージ描画
@@ -246,6 +324,29 @@ void DrawStage()
 // プレイヤー入力
 void PlayerInput()
 {
+    //XINPUT_STATE input;
+
+    //float lx, ly;
+    //if (GetJoypadXInputState(DX_INPUT_PAD1, &input) == 0) {
+    //    lx = (float)input.ThumbLX;
+    //    lx /= 32767.0f;
+    //    ObjMomo.x += (int)(lx * ObjMomo.vx);
+
+    //    // Yボタンで斬撃
+    //    if (input.Buttons & XINPUT_BUTTON_Y) {
+    //        if (bIsAttacking == false) {
+    //            bIsAttacking = true;
+    //        }
+    //    }
+
+    //    // Bボタンでジャンプ
+    //    if (input.Buttons & XINPUT_BUTTON_B) {
+    //        if (!bJumpUp && !bJumpDown) {
+    //            bJumpUp = true;
+    //        }
+    //    }
+    //}
+
     // →キー
     if (CheckHitKey(KEY_INPUT_RIGHT)) {
         ObjMomo.x += ObjMomo.vx;
@@ -264,10 +365,12 @@ void PlayerInput()
         if (bIsAttacking == false) {
             bIsAttacking = true;
         }
+
         // スペースキーを攻撃モーションに割り当ててるのでいったんコメントアウト
         //if (!bJumpUp && !bJumpDown) {
         //    bJumpUp = true;
         //}
     }
 }
+
 
