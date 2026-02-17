@@ -54,6 +54,7 @@ OBJECT ObjSword; // Œ•
 
 // “G
 OBJECT ObjEnemy;
+OBJECT ObjEnemy2;
 int nDamagedEnemy;
 //OBJECT ObjDamagedEnemy;
 void DamageToEnemy();

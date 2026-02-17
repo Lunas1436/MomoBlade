@@ -68,6 +68,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
         }
 
+        if (nCameraX < ObjEnemy2.x && ObjEnemy2.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
+            if (nDamagingTimer == 0) {
+                DrawGraph(ObjEnemy2.x - nCameraX, ObjEnemy2.y, ObjEnemy2.img, TRUE);
+            }
+        }
+
         // ヒットチェック
         if (bIsHit == false) { // 剣の先端が敵の矩形の中にあればヒット
             if (HitCheckToEnemy()) {
@@ -158,6 +164,9 @@ void InitData()
     nDamagedEnemy = LoadGraph("Image/DamagedEnemy1.png");
     bIsHit = false;
     nDamagingTimer = 0;
+
+    SetObjParameter(&ObjEnemy2, 1000, 100, 0.0f, 0.0f, "Image/Enemy2.png");
+    ObjEnemy2.y += ObjEnemy2.height / 2;
 
     // ステージBGM
     nStageBGM = LoadSoundMem("Sound/StageBGM.wav");
@@ -281,7 +290,6 @@ void DrawHP()
     int nFullHP = nCurrentHP / 4;
     int nLeftHP = nCurrentHP % 4;
     int nNonHP = (HP_MAX * 4 - nCurrentHP) / 4;
-
 
     int i = 0;
     // フルHP
