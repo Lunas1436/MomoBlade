@@ -33,15 +33,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // ステージ描画
         DrawStage();
 
-        // HP確認用
-        DrawHP();
-
         // プレイヤー入力
         PlayerInput();
-
-        // ジャンプ上昇中か落下中か判定
-        CheckJumpState();
         
+        // カメラ座標(モモを中心)
         nCameraX = (ObjMomo.x + ObjMomo.width / 2) - SCREEN_WIDTH / 2;
         if (nCameraX < 0) {
             nCameraX = 0;
@@ -50,21 +45,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             nCameraX = STAGE_WIDTH - SCREEN_WIDTH;
         }
 
-        // モモ描画
-        DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
+        // モモと剣描画
+        DrawMomo();
 
-        // 剣描画
-        ObjSword.x = ObjMomo.x - nCameraX + ObjMomo.width + 10;
-        ObjSword.y = ObjMomo.y - 20;
-        if (bIsAttacking) { // 斬撃モーション
-            SwordAttack();
-        }
-        DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
+        // HP描画
+        DrawHP();
 
         // 敵描画確認用
-        if (nCameraX < ObjEnemy.x && ObjEnemy.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
+        if (nCameraX < ObjEnemy1.x && ObjEnemy1.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
             if (nDamagingTimer == 0) {
-                DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.img, TRUE);
+                DrawGraph(ObjEnemy1.x - nCameraX, ObjEnemy1.y, ObjEnemy1.img, TRUE);
             }
         }
 
@@ -148,7 +138,6 @@ void InitData()
     GetGraphSize(nImgHP[0], &nHPWidth, &nTempH);
     nHPX = 20, nHPY = 20; // とりあえずの座標
     nCurrentHP = HP_MAX * 4;
-
     
     // 剣
     SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword2.png");
@@ -158,8 +147,8 @@ void InitData()
     dSwordAngle = 0;
 
     // 敵1
-    SetObjParameter(&ObjEnemy, 1000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
-    ObjEnemy.y += ObjEnemy.height / 2;
+    SetObjParameter(&ObjEnemy1, 1000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
+    ObjEnemy1.y += ObjEnemy1.height / 2;
     // 敵1がダメージを受けたとき用
     nDamagedEnemy = LoadGraph("Image/DamagedEnemy1.png");
     bIsHit = false;
@@ -189,6 +178,24 @@ void SetObjParameter(OBJECT *pObj, float fx, float fy, float fvx, float fvy, con
     pObj->y = fy;
     pObj->vx = fvx;
     pObj->vy = fvy;
+}
+
+// モモと剣描画
+void DrawMomo()
+{
+    // ジャンプ上昇中か落下中か判定
+    CheckJumpState();
+
+    // モモ描画
+    DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
+
+    // 剣描画
+    ObjSword.x = ObjMomo.x - nCameraX + ObjMomo.width + 10;
+    ObjSword.y = ObjMomo.y - 20;
+    if (bIsAttacking) { // 攻撃中なら斬撃モーション
+        SwordAttack();
+    }
+    DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
 }
 
 
@@ -242,8 +249,8 @@ bool HitCheckToEnemy()
     double TipY = ObjSword.y + ObjSword.height + dSwordLength * sin(dSwordAngle);
 
     // 剣先が敵矩形の中にあるか判定
-    if (TipX >= ObjEnemy.x - nCameraX && TipX <= ObjEnemy.x - nCameraX + ObjEnemy.width &&
-        TipY >= ObjEnemy.y && TipY <= ObjEnemy.y + ObjEnemy.height) {
+    if (TipX >= ObjEnemy1.x - nCameraX && TipX <= ObjEnemy1.x - nCameraX + ObjEnemy1.width &&
+        TipY >= ObjEnemy1.y && TipY <= ObjEnemy1.y + ObjEnemy1.height) {
         return true;
     }
 
@@ -253,9 +260,9 @@ bool HitCheckToEnemy()
 // モモと敵とのヒットチェック
 bool HitCheckToMomo()
 {
-    int dx = abs((ObjMomo.x + ObjMomo.width / 2) - (ObjEnemy.x + ObjEnemy.width / 2));
-    int dy = abs((ObjMomo.y + ObjMomo.height / 2) - (ObjEnemy.y + ObjEnemy.height / 2));
-    if ((dx <= ObjMomo.width / 2 + ObjEnemy.width / 2) && (dy <= ObjMomo.height / 2 + ObjEnemy.height / 2)) {
+    int dx = abs((ObjMomo.x + ObjMomo.width / 2) - (ObjEnemy1.x + ObjEnemy1.width / 2));
+    int dy = abs((ObjMomo.y + ObjMomo.height / 2) - (ObjEnemy1.y + ObjEnemy1.height / 2));
+    if ((dx <= ObjMomo.width / 2 + ObjEnemy1.width / 2) && (dy <= ObjMomo.height / 2 + ObjEnemy1.height / 2)) {
         return true;
     }
 
@@ -275,12 +282,12 @@ void DamageToMomo()
 // 敵がダメージを受けたときの演出
 void DamageToEnemy()
 {
-    DrawGraph(ObjEnemy.x - nCameraX, ObjEnemy.y, nDamagedEnemy, TRUE); // 被ダメージの敵描画
+    DrawGraph(ObjEnemy1.x - nCameraX, ObjEnemy1.y, nDamagedEnemy, TRUE); // 被ダメージの敵描画
 
     // ダメージ演出
     SetDrawBlendMode(DX_BLENDMODE_ADD, 255);   // 色を加算する設定
     int col = GetColor(rand() % 256, rand() % 256, rand() % 256); // 確認用
-    DrawBox(ObjEnemy.x - nCameraX, ObjEnemy.y, ObjEnemy.x - nCameraX + ObjEnemy.width, ObjEnemy.y + ObjEnemy.height, col, TRUE);
+    DrawBox(ObjEnemy1.x - nCameraX, ObjEnemy1.y, ObjEnemy1.x - nCameraX + ObjEnemy1.width, ObjEnemy1.y + ObjEnemy1.height, col, TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // 通常の描画に戻す 
 }
 
@@ -305,9 +312,7 @@ void DrawHP()
 
     for (int j = 0; j < nNonHP; j++) {
         DrawGraph(nHPX + nHPWidth * (i + j), nHPY, nImgHP[0], TRUE);
-
     }
-
 }
 
 // ステージ描画
