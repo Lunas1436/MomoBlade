@@ -73,6 +73,7 @@ int nImgHP[5]; // ハートの画像(HP0～MAX)
 int nCurrentHP = HP_MAX * 4; // モモのHP(初期値MAX)
 int nHPX, nHPY, nHPWidth;
 
+OBJECT ObjGoalFlag;
 
 void SwordAttack();     // 斬撃モーション
 bool HitCheckToMomo();

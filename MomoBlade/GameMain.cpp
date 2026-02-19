@@ -51,6 +51,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // HP描画
         DrawHP();
 
+        // ゴールフラッグ描画
+        DrawGraph(ObjGoalFlag.x - nCameraX, ObjGoalFlag.y, ObjGoalFlag.img, TRUE);
+
         // 敵描画確認用
         if (nCameraX < ObjEnemy1.x && ObjEnemy1.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
             if (nDamagingTimer == 0) {
@@ -123,6 +126,10 @@ void InitData()
     // 地中
     SetObjParameter(&ObjUnderGround, ObjGround.x, 0.0f, 0.0f, 0.0f, "Image/UnderGround.png");
     ObjUnderGround.y = ObjGround.y + ObjUnderGround.height;
+
+    // ゴールフラッグ
+    SetObjParameter(&ObjGoalFlag, 1500, 0.0f, 0.0f, 0.0f, "Image/GoalFlag.png");
+    ObjGoalFlag.y = ObjGround.y - ObjGoalFlag.height;
 
     // モモタロー
     SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo2.png");
