@@ -55,6 +55,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         DrawGraph(ObjGoalFlag.x - nCameraX, ObjGoalFlag.y, ObjGoalFlag.img, TRUE);
 
         // 敵描画確認用
+        DrawEnemy();
         if (nCameraX < ObjEnemy1.x && ObjEnemy1.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
             if (nDamagingTimer == 0) {
                 DrawGraph(ObjEnemy1.x - nCameraX, ObjEnemy1.y, ObjEnemy1.img, TRUE);
@@ -153,16 +154,24 @@ void InitData()
     bIsAttacking = false;
     dSwordAngle = 0;
 
+    // 確認用
     // 敵1
     SetObjParameter(&ObjEnemy1, 1000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
     ObjEnemy1.y += ObjEnemy1.height / 2;
+    // 敵2
+    SetObjParameter(&ObjEnemy2, 1000, 100, 0.0f, 0.0f, "Image/Enemy2.png");
+    ObjEnemy2.y += ObjEnemy2.height / 2;
+    // 敵3
+    SetObjParameter(&ObjEnemy3, 1100, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy3.png");
+    ObjEnemy3.y += ObjEnemy3.height / 2;
     // 敵1がダメージを受けたとき用
     nDamagedEnemy = LoadGraph("Image/DamagedEnemy1.png");
     bIsHit = false;
     nDamagingTimer = 0;
 
-    SetObjParameter(&ObjEnemy2, 1000, 100, 0.0f, 0.0f, "Image/Enemy2.png");
-    ObjEnemy2.y += ObjEnemy2.height / 2;
+    ObjEnemyList[0] = ObjEnemy1;
+    ObjEnemyList[1] = ObjEnemy2;
+    ObjEnemyList[2] = ObjEnemy3;
 
     // ステージBGM
     nStageBGM = LoadSoundMem("Sound/StageBGM.wav");
@@ -205,6 +214,18 @@ void DrawMomo()
     DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
 }
 
+// 敵描画
+void DrawEnemy()
+{
+    for (int i = 0; i < 3; i++) {
+        if (nCameraX < ObjEnemyList[i].x && ObjEnemyList[i].x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
+            if (nDamagingTimer == 0) {
+                DrawGraph(ObjEnemyList[i].x - nCameraX, ObjEnemyList[i].y, ObjEnemyList[i].img, TRUE);
+            }
+        }
+    }
+
+}
 
 // ジャンプ状態チェック
 void CheckJumpState()

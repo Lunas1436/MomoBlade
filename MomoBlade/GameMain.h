@@ -55,6 +55,8 @@ OBJECT ObjSword; // 剣
 // 敵
 OBJECT ObjEnemy1;
 OBJECT ObjEnemy2;
+OBJECT ObjEnemy3;
+OBJECT ObjEnemyList[3];
 int nDamagedEnemy;
 //OBJECT ObjDamagedEnemy;
 void DamageToEnemy();
@@ -67,6 +69,7 @@ void DrawStage();
 void PlayerInput();
 
 void DrawMomo();
+void DrawEnemy();
 void DrawHP();
 const int HP_MAX = 3; // MAXのHPはハート(HP)3個
 int nImgHP[5]; // ハートの画像(HP0～MAX)
