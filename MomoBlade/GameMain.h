@@ -37,6 +37,7 @@ struct OBJECT
 OBJECT ObjSky;
 OBJECT ObjGround;      // 地面
 OBJECT ObjUnderGround; // 地中
+OBJECT ObjGoalFlag;    // ゴールフラッグ
 
 // BGM
 int nStageBGM; // ステージ
@@ -48,7 +49,9 @@ const float GRAVITEY = 0.8f;
 const float JUMP_UP_POWER = 0.8f;
 bool bJumpUp = false;
 bool bJumpDown = false;
-int nCameraX = 0;
+int nCameraX = 0; // モモを中心とするカメラのX座標
+bool bHitToMomo = false;
+int nMomoDamagedTimer = 0;
 
 OBJECT ObjSword; // 剣
 
@@ -58,9 +61,9 @@ OBJECT ObjEnemy2;
 OBJECT ObjEnemy3;
 OBJECT ObjEnemyList[3];
 int nDamagedEnemy;
-//OBJECT ObjDamagedEnemy;
-void DamageToEnemy();
-int nDamagingTimer;
+bool bHitToEnemy = false;
+int nEnemyDamagedTimer = 0;
+void DrawDamageToEnemy();
 
 void InitData();
 void SetObjParameter(OBJECT* pObj, float fx, float fy, float fvx, float fvy, const char* pchImg);
@@ -76,14 +79,11 @@ int nImgHP[5]; // ハートの画像(HP0～MAX)
 int nCurrentHP = HP_MAX * 4; // モモのHP(初期値MAX)
 int nHPX, nHPY, nHPWidth;
 
-OBJECT ObjGoalFlag;
-
+// 剣
 void SwordAttack();     // 斬撃モーション
 bool HitCheckToMomo();
 bool HitCheckToEnemy(); // 敵と剣先とのヒットチェック
-void DamageToMomo();
-bool bIsHit = false;
-bool bDamaging = false;
+void DrawDamageToMomo();
 double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
 bool bIsAttacking;
 int nAttackingTimer;
