@@ -18,6 +18,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     // 初期化
     InitData();
 
+    int nBlock = LoadGraph("Image/Block.png");
+
     // ステージのBGMをループ再生で流す
     PlaySoundMem(nStageBGM, DX_PLAYTYPE_LOOP);
 
@@ -85,6 +87,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
         }
 
+        DrawGraph(ObjEnemyList[0].x + 300 - nCameraX, ObjEnemyList[0].y, nBlock, TRUE);
+
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
         if (CheckHitKey(KEY_INPUT_ESCAPE) == 1) break; // ESCキーが押されたら終了
@@ -109,6 +113,10 @@ void InitData()
     // 地中
     SetObjParameter(&ObjUnderGround, ObjGround.x, 0.0f, 0.0f, 0.0f, "Image/UnderGround.png");
     ObjUnderGround.y = ObjGround.y + ObjUnderGround.height;
+
+    // ブロック
+    SetObjParameter(&ObjBlock, 500, 0.0f, 0.0f, 0.0f, "Image/Block.png");
+    ObjBlock.y = ObjGround.y - 150; // 150は感覚値
 
     // ゴールフラッグ
     SetObjParameter(&ObjGoalFlag, 1500, 0.0f, 0.0f, 0.0f, "Image/GoalFlag.png");
@@ -217,6 +225,11 @@ void DrawStage()
         DrawGraph(i * ObjUnderGround.width - nCameraX, ObjGround.y + ObjGround.height, ObjUnderGround.img, TRUE); // 地中
     }
 
+    // ブロック描画
+    for (int i = 0; i < 5; i++) {
+        DrawGraph(ObjBlock.x + i * ObjBlock.width - nCameraX, ObjBlock.y, ObjBlock.img, TRUE);
+    }
+
 }
 
 // プレイヤー入力
@@ -237,20 +250,29 @@ void PlayerInput()
 
     // スペースキー
     if (CheckHitKey(KEY_INPUT_SPACE)) {
-        if (bIsAttacking == false) {
-            bIsAttacking = true;
-        }
+        //if (bIsAttacking == false) {
+        //    bIsAttacking = true;
+        //}
 
         // スペースキーを攻撃モーションに割り当ててるのでいったんコメントアウト
-        //if (!bJumpUp && !bJumpDown) {
-        //    bJumpUp = true;
-        //}
+        if (!bJumpUp && !bJumpDown) {
+            bJumpUp = true;
+        }
     }
 }
 
 // モモと剣描画
 void DrawMomo()
 {
+    if (ObjBlock.x <= ObjMomo.x + ObjMomo.width / 2 && ObjMomo.x + ObjMomo.width / 2 <= ObjBlock.x + ObjBlock.width * 5) {
+        if (ObjMomo.y + ObjMomo.height >= ObjBlock.y) {
+            // ブロック上に着地
+            ObjMomo.y = ObjBlock.y - ObjMomo.height;
+            bJumpUp = false;
+            bJumpDown = false;
+        }
+    }
+
     // ジャンプ上昇中か落下中か判定
     CheckJumpState();
 
@@ -279,7 +301,13 @@ void CheckJumpState()
     }
 
     ObjMomo.y += ObjMomo.vy;
-    if (ObjMomo.y - ObjMomo.height / 2 <= 200) { // とりあえず天井を200に設定 
+    if (ObjMomo.y <= ObjBlock.y + ObjBlock.height) {
+        ObjMomo.y = ObjBlock.y + ObjBlock.height;
+        bJumpUp = false;
+        bJumpDown = true;
+    }
+
+    if (ObjMomo.y <= 200) { // とりあえず天井を200に設定 
         bJumpUp = false;
         bJumpDown = true;
     }
@@ -310,7 +338,7 @@ void SwordAttack()
 // 敵描画
 void DrawEnemy()
 {
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 1; i++) {
         if (nCameraX < ObjEnemyList[i].x && ObjEnemyList[i].x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
             if (nEnemyDamagedTimer == 0) {
                 DrawGraph(ObjEnemyList[i].x - nCameraX, ObjEnemyList[i].y, ObjEnemyList[i].img, TRUE);

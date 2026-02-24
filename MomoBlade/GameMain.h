@@ -34,9 +34,10 @@ struct OBJECT
 };
 
 // ステージ描画
-OBJECT ObjSky;
+OBJECT ObjSky;         // 空    
 OBJECT ObjGround;      // 地面
 OBJECT ObjUnderGround; // 地中
+OBJECT ObjBlock;       // ブロック
 OBJECT ObjGoalFlag;    // ゴールフラッグ
 
 // BGM
