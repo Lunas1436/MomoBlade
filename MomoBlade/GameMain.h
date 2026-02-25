@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 // ステージ
 const int STAGE_WIDTH = 5000;
 const int STAGE_HEIGHT = 600;
@@ -39,6 +41,8 @@ OBJECT ObjGround;      // 地面
 OBJECT ObjUnderGround; // 地中
 OBJECT ObjBlock;       // ブロック
 OBJECT ObjGoalFlag;    // ゴールフラッグ
+std::vector<OBJECT> ObjBlockList;    // ブロックリスト
+
 
 // BGM
 int nStageBGM; // ステージ
@@ -46,15 +50,24 @@ int nSlashBGM; // 斬撃
 
 // モモタロー
 OBJECT ObjMomo;
-const float GRAVITEY = 0.8f;
+const float GRAVITEY = 1.2f;
 const float JUMP_UP_POWER = 0.8f;
-bool bJumpUp = false;
-bool bJumpDown = false;
+bool bOnLand = true;
+bool bOnGround = true;
 int nCameraX = 0; // モモを中心とするカメラのX座標
 bool bHitToMomo = false;
 int nMomoDamagedTimer = 0;
 
-OBJECT ObjSword; // 剣
+// 剣
+OBJECT ObjSword;
+void SwordAttack();     // 斬撃モーション
+bool HitCheckToMomo();
+bool HitCheckToEnemy(); // 敵と剣先とのヒットチェック
+void DrawDamageToMomo();
+double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
+bool bIsAttacking;
+int nAttackingTimer;
+double dSwordAngle = 0;
 
 // 敵
 OBJECT ObjEnemy1;
@@ -80,12 +93,3 @@ int nImgHP[5]; // ハートの画像(HP0～MAX)
 int nCurrentHP = HP_MAX * 4; // モモのHP(初期値MAX)
 int nHPX, nHPY, nHPWidth;
 
-// 剣
-void SwordAttack();     // 斬撃モーション
-bool HitCheckToMomo();
-bool HitCheckToEnemy(); // 敵と剣先とのヒットチェック
-void DrawDamageToMomo();
-double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
-bool bIsAttacking;
-int nAttackingTimer;
-double dSwordAngle = 0;

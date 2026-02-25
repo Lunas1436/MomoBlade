@@ -6,6 +6,8 @@
 
 using namespace std;
 
+float fMaxY = 0.0; // 確認用
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     SetWindowText("MOMO BLADE"); // ウィンドウのタイトル
@@ -115,8 +117,13 @@ void InitData()
     ObjUnderGround.y = ObjGround.y + ObjUnderGround.height;
 
     // ブロック
-    SetObjParameter(&ObjBlock, 500, 0.0f, 0.0f, 0.0f, "Image/Block.png");
-    ObjBlock.y = ObjGround.y - 150; // 150は感覚値
+    SetObjParameter(&ObjBlock, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Block.png");
+    for (int i = 0; i < 5; i++) {
+        OBJECT ObjTempBlock = ObjBlock;
+        ObjTempBlock.x = 500 + i * ObjTempBlock.width;
+        ObjTempBlock.y = ObjGround.y - 150; // 150は感覚値
+        ObjBlockList.push_back(ObjTempBlock);
+    }
 
     // ゴールフラッグ
     SetObjParameter(&ObjGoalFlag, 1500, 0.0f, 0.0f, 0.0f, "Image/GoalFlag.png");
@@ -227,7 +234,7 @@ void DrawStage()
 
     // ブロック描画
     for (int i = 0; i < 5; i++) {
-        DrawGraph(ObjBlock.x + i * ObjBlock.width - nCameraX, ObjBlock.y, ObjBlock.img, TRUE);
+        DrawGraph(ObjBlockList[i].x - nCameraX, ObjBlockList[i].y, ObjBlock.img, TRUE);
     }
 
 }
@@ -254,27 +261,60 @@ void PlayerInput()
         //    bIsAttacking = true;
         //}
 
-        // スペースキーを攻撃モーションに割り当ててるのでいったんコメントアウト
-        if (!bJumpUp && !bJumpDown) {
-            bJumpUp = true;
+        if (bOnLand) {
+            fMaxY = ObjMomo.y - 100; // とりあえず現在地から100ドットをジャンプの上限とする
+            bOnLand = false;
+            bOnGround = false;
         }
+
     }
 }
 
 // モモと剣描画
 void DrawMomo()
 {
-    if (ObjBlock.x <= ObjMomo.x + ObjMomo.width / 2 && ObjMomo.x + ObjMomo.width / 2 <= ObjBlock.x + ObjBlock.width * 5) {
-        if (ObjMomo.y + ObjMomo.height >= ObjBlock.y) {
-            // ブロック上に着地
-            ObjMomo.y = ObjBlock.y - ObjMomo.height;
-            bJumpUp = false;
-            bJumpDown = false;
+    // オブジェクト上にいる
+    if (bOnLand) {
+
+    }
+    // 空中にいる
+    else {
+        // ジャンプUP中
+        if (ObjMomo.y >= fMaxY) {
+            ObjMomo.vy -= JUMP_UP_POWER;
+        }
+        // ジャンプDOWN中
+        else {
+            ObjMomo.vy += GRAVITEY;
+        }
+
+        float prevBottom = ObjMomo.y + ObjMomo.height;
+        ObjMomo.y += ObjMomo.vy;
+
+        // 地面の上にいるかどうか判定
+        if (prevBottom <= ObjGround.y && ObjGround.y <= ObjMomo.y + ObjMomo.height) {
+            ObjMomo.y = ObjGround.y - ObjMomo.height;
+            bOnLand = true;
+            bOnGround = true;
+        }
+
+        // 地面以外のオブジェクトの上にいるかどうか判定
+        if (!bOnGround) {
+            for (int i = 0; i < ObjBlockList.size(); i++) {
+                float fLandX = ObjBlockList[i].x;
+                float fLandY = ObjBlockList[i].y;
+                if (fLandX <= ObjMomo.x && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
+                    if (prevBottom <= fLandY && fLandY <= ObjMomo.y + ObjMomo.height) {
+                        // 着地
+                        ObjMomo.y = fLandY - ObjMomo.height;
+                        bOnLand = true;
+                        break;
+                    }
+                }
+            }
         }
     }
 
-    // ジャンプ上昇中か落下中か判定
-    CheckJumpState();
 
     // モモ描画
     DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
@@ -286,37 +326,6 @@ void DrawMomo()
         SwordAttack();
     }
     DrawRotaGraph2(ObjSword.x, ObjSword.y + ObjSword.height, 0, ObjSword.height, 1.0, dSwordAngle, ObjSword.img, TRUE);
-}
-
-// ジャンプ状態チェック
-void CheckJumpState()
-{
-    // ジャンプアップ中
-    if (bJumpUp) {
-        ObjMomo.vy -= JUMP_UP_POWER;
-    }
-    // ジャンプ落下中
-    if (bJumpDown) {
-        ObjMomo.vy += GRAVITEY;
-    }
-
-    ObjMomo.y += ObjMomo.vy;
-    if (ObjMomo.y <= ObjBlock.y + ObjBlock.height) {
-        ObjMomo.y = ObjBlock.y + ObjBlock.height;
-        bJumpUp = false;
-        bJumpDown = true;
-    }
-
-    if (ObjMomo.y <= 200) { // とりあえず天井を200に設定 
-        bJumpUp = false;
-        bJumpDown = true;
-    }
-
-    if (bJumpDown && ObjMomo.y + ObjMomo.height >= ObjGround.y) { // 着地
-        ObjMomo.y = ObjGround.y - ObjMomo.height;
-        ObjMomo.vy = 0;
-        bJumpDown = false;
-    }
 }
 
 // 斬撃モーション
