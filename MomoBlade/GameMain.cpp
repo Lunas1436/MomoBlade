@@ -300,6 +300,7 @@ void DrawMomo()
             ObjMomo.vy += GRAVITEY;
         }
 
+        float prevTop = ObjMomo.y;
         float prevBottom = ObjMomo.y + ObjMomo.height;
         ObjMomo.y += ObjMomo.vy;
 
@@ -325,8 +326,21 @@ void DrawMomo()
                         }
                     }
                 }
+            }   
+        }
+        // “Vˆä”»’è
+        else {
+            for (int i = 0; i < ObjBlockList.size(); i++) {
+                float fLandX = ObjBlockList[i].x;
+                float fLandY = ObjBlockList[i].y;
+                if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
+                    if (ObjBlockList[i].y + ObjBlockList[i].height <= prevTop && ObjMomo.y <= ObjBlockList[i].y + ObjBlockList[i].height) {
+                        ObjMomo.y = ObjBlockList[i].y + ObjBlockList[i].height;
+                        fMaxY = ObjGround.y;
+                        break;
+                    }
+                }
             }
-            
         }
     }
 
