@@ -52,6 +52,7 @@ int nSlashBGM; // aŒ‚
 OBJECT ObjMomo;
 const float GRAVITEY = 1.2f;
 const float JUMP_UP_POWER = 0.8f;
+float fMaxY = 0.0f;
 bool bOnLand = true;
 bool bOnGround = true;
 int nCameraX = 0; // ƒ‚ƒ‚‚ğ’†S‚Æ‚·‚éƒJƒƒ‰‚ÌXÀ•W
@@ -81,7 +82,6 @@ void DrawDamageToEnemy();
 
 void InitData();
 void SetObjParameter(OBJECT* pObj, float fx, float fy, float fvx, float fvy, const char* pchImg);
-void CheckJumpState();
 void DrawStage();
 void PlayerInput();
 

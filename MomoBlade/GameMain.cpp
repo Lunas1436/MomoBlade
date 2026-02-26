@@ -6,8 +6,6 @@
 
 using namespace std;
 
-float fMaxY = 0.0; // 確認用
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     SetWindowText("MOMO BLADE"); // ウィンドウのタイトル
@@ -19,8 +17,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // 初期化
     InitData();
-
-    int nBlock = LoadGraph("Image/Block.png");
 
     // ステージのBGMをループ再生で流す
     PlaySoundMem(nStageBGM, DX_PLAYTYPE_LOOP);
@@ -89,8 +85,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
             }
         }
 
-        DrawGraph(ObjEnemyList[0].x + 300 - nCameraX, ObjEnemyList[0].y, nBlock, TRUE);
-
         ScreenFlip(); // 裏画面の内容を表画面に反映させる
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
         if (CheckHitKey(KEY_INPUT_ESCAPE) == 1) break; // ESCキーが押されたら終了
@@ -121,6 +115,13 @@ void InitData()
     ObjBlock.x = 500;
     ObjBlock.y = ObjGround.y - 150;
     ObjBlockList.push_back(ObjBlock);
+
+    // 確認用
+    OBJECT ObjBlock2 = ObjBlock;
+    ObjBlock2.x = 700;
+    ObjBlock2.y -= 150;
+    ObjBlockList.push_back(ObjBlock2);
+
 
     // ゴールフラッグ
     SetObjParameter(&ObjGoalFlag, 1500, 0.0f, 0.0f, 0.0f, "Image/GoalFlag.png");
@@ -270,6 +271,9 @@ void PlayerInput()
 // モモと剣描画
 void DrawMomo()
 {
+    float fPrevTop = ObjMomo.y;
+    float fPrevBottom = ObjMomo.y + ObjMomo.height;
+
     // オブジェクト上にいる
     if (bOnLand) {
         if (!bOnGround) {
@@ -277,15 +281,17 @@ void DrawMomo()
             for (int i = 0; i < ObjBlockList.size(); i++) {
                 float fLandX = ObjBlockList[i].x;
                 float fLandY = ObjBlockList[i].y;
-                if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
-                    bInRange = true;
-                    break;
+                if (fPrevBottom <= fLandY && fLandY <= ObjMomo.y + ObjMomo.height) {
+                    if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
+                        bInRange = true;
+                        break;
+                    }
                 }
             }
             if (!bInRange) {
                 bOnLand = false;
                 bOnGround = false;
-                
+                fMaxY = ObjGround.y;
             }
         }
     }
@@ -300,28 +306,28 @@ void DrawMomo()
             ObjMomo.vy += GRAVITEY;
         }
 
-        float prevTop = ObjMomo.y;
-        float prevBottom = ObjMomo.y + ObjMomo.height;
         ObjMomo.y += ObjMomo.vy;
 
         // 着地判定
         if (ObjMomo.vy > 0) {
             // 地面の上にいるかどうか判定
-            if (prevBottom <= ObjGround.y && ObjGround.y <= ObjMomo.y + ObjMomo.height) {
+            if (fPrevBottom <= ObjGround.y && ObjGround.y <= ObjMomo.y + ObjMomo.height) {
                 ObjMomo.y = ObjGround.y - ObjMomo.height;
                 bOnLand = true;
                 bOnGround = true;
+                ObjMomo.vy = 0;
             }
             // 地面以外のオブジェクトの上にいるかどうか判定
             if (!bOnGround) {
                 for (int i = 0; i < ObjBlockList.size(); i++) {
                     float fLandX = ObjBlockList[i].x;
                     float fLandY = ObjBlockList[i].y;
-                    if (fLandX <= ObjMomo.x && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
-                        if (prevBottom <= fLandY && fLandY <= ObjMomo.y + ObjMomo.height) {
+                    if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
+                        if (fPrevBottom <= fLandY && fLandY <= ObjMomo.y + ObjMomo.height) {
                             // 着地
                             ObjMomo.y = fLandY - ObjMomo.height;
                             bOnLand = true;
+                            ObjMomo.vy = 0;
                             break;
                         }
                     }
@@ -329,12 +335,12 @@ void DrawMomo()
             }   
         }
         // 天井判定
-        else {
+        if (ObjMomo.vy < 0) {
             for (int i = 0; i < ObjBlockList.size(); i++) {
                 float fLandX = ObjBlockList[i].x;
                 float fLandY = ObjBlockList[i].y;
                 if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
-                    if (ObjBlockList[i].y + ObjBlockList[i].height <= prevTop && ObjMomo.y <= ObjBlockList[i].y + ObjBlockList[i].height) {
+                    if (ObjBlockList[i].y + ObjBlockList[i].height <= fPrevTop && ObjMomo.y <= ObjBlockList[i].y + ObjBlockList[i].height) {
                         ObjMomo.y = ObjBlockList[i].y + ObjBlockList[i].height;
                         fMaxY = ObjGround.y;
                         break;
