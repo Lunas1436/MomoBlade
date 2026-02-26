@@ -118,12 +118,9 @@ void InitData()
 
     // ブロック
     SetObjParameter(&ObjBlock, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Block.png");
-    for (int i = 0; i < 5; i++) {
-        OBJECT ObjTempBlock = ObjBlock;
-        ObjTempBlock.x = 500 + i * ObjTempBlock.width;
-        ObjTempBlock.y = ObjGround.y - 150; // 150は感覚値
-        ObjBlockList.push_back(ObjTempBlock);
-    }
+    ObjBlock.x = 500;
+    ObjBlock.y = ObjGround.y - 150;
+    ObjBlockList.push_back(ObjBlock);
 
     // ゴールフラッグ
     SetObjParameter(&ObjGoalFlag, 1500, 0.0f, 0.0f, 0.0f, "Image/GoalFlag.png");
@@ -233,7 +230,7 @@ void DrawStage()
     }
 
     // ブロック描画
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < ObjBlockList.size(); i++) {
         DrawGraph(ObjBlockList[i].x - nCameraX, ObjBlockList[i].y, ObjBlock.img, TRUE);
     }
 
@@ -275,12 +272,27 @@ void DrawMomo()
 {
     // オブジェクト上にいる
     if (bOnLand) {
-
+        if (!bOnGround) {
+            bool bInRange = false;
+            for (int i = 0; i < ObjBlockList.size(); i++) {
+                float fLandX = ObjBlockList[i].x;
+                float fLandY = ObjBlockList[i].y;
+                if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
+                    bInRange = true;
+                    break;
+                }
+            }
+            if (!bInRange) {
+                bOnLand = false;
+                bOnGround = false;
+                
+            }
+        }
     }
     // 空中にいる
     else {
         // ジャンプUP中
-        if (ObjMomo.y >= fMaxY) {
+        if (ObjMomo.y > fMaxY) {
             ObjMomo.vy -= JUMP_UP_POWER;
         }
         // ジャンプDOWN中
@@ -291,30 +303,32 @@ void DrawMomo()
         float prevBottom = ObjMomo.y + ObjMomo.height;
         ObjMomo.y += ObjMomo.vy;
 
-        // 地面の上にいるかどうか判定
-        if (prevBottom <= ObjGround.y && ObjGround.y <= ObjMomo.y + ObjMomo.height) {
-            ObjMomo.y = ObjGround.y - ObjMomo.height;
-            bOnLand = true;
-            bOnGround = true;
-        }
-
-        // 地面以外のオブジェクトの上にいるかどうか判定
-        if (!bOnGround) {
-            for (int i = 0; i < ObjBlockList.size(); i++) {
-                float fLandX = ObjBlockList[i].x;
-                float fLandY = ObjBlockList[i].y;
-                if (fLandX <= ObjMomo.x && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
-                    if (prevBottom <= fLandY && fLandY <= ObjMomo.y + ObjMomo.height) {
-                        // 着地
-                        ObjMomo.y = fLandY - ObjMomo.height;
-                        bOnLand = true;
-                        break;
+        // 着地判定
+        if (ObjMomo.vy > 0) {
+            // 地面の上にいるかどうか判定
+            if (prevBottom <= ObjGround.y && ObjGround.y <= ObjMomo.y + ObjMomo.height) {
+                ObjMomo.y = ObjGround.y - ObjMomo.height;
+                bOnLand = true;
+                bOnGround = true;
+            }
+            // 地面以外のオブジェクトの上にいるかどうか判定
+            if (!bOnGround) {
+                for (int i = 0; i < ObjBlockList.size(); i++) {
+                    float fLandX = ObjBlockList[i].x;
+                    float fLandY = ObjBlockList[i].y;
+                    if (fLandX <= ObjMomo.x && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
+                        if (prevBottom <= fLandY && fLandY <= ObjMomo.y + ObjMomo.height) {
+                            // 着地
+                            ObjMomo.y = fLandY - ObjMomo.height;
+                            bOnLand = true;
+                            break;
+                        }
                     }
                 }
             }
+            
         }
     }
-
 
     // モモ描画
     DrawGraph(ObjMomo.x - nCameraX, ObjMomo.y, ObjMomo.img, TRUE);
