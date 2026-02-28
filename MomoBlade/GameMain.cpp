@@ -100,50 +100,52 @@ void InitData()
     // ステージ
     // 空
     // 雲のX軸の移動速度を0.5f
-    SetObjParameter(&ObjSky, 0.0f, 0.0f, 0.5f, 0.0f, "Image/Sky.png");
+    SetObjParameter(&ObjSky, 0.0f, 0.0f, 0.5f, 0.0f, "Image/Stage/Sky.png");
 
     // 地面
-    SetObjParameter(&ObjGround, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Ground_1.png");
+    SetObjParameter(&ObjGround, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Stage/Ground.png");
     ObjGround.y = SCREEN_HEIGHT - ObjGround.height * 3;
 
     // 地中
-    SetObjParameter(&ObjUnderGround, ObjGround.x, 0.0f, 0.0f, 0.0f, "Image/UnderGround.png");
+    SetObjParameter(&ObjUnderGround, ObjGround.x, 0.0f, 0.0f, 0.0f, "Image/Stage/UnderGround.png");
     ObjUnderGround.y = ObjGround.y + ObjUnderGround.height;
 
     // ブロック
-    SetObjParameter(&ObjBlock, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Block.png");
+    SetObjParameter(&ObjBlock, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Stage/Block.png");
     ObjBlock.x = 500;
     ObjBlock.y = ObjGround.y - 150;
     ObjBlockList.push_back(ObjBlock);
 
-    // 確認用
-    OBJECT ObjBlock2 = ObjBlock;
-    ObjBlock2.x = 700;
-    ObjBlock2.y -= 150;
-    ObjBlockList.push_back(ObjBlock2);
+    // ブロック配置
+    ObjBlock.x = 700;
+    ObjBlock.y -= 150;
+    ObjBlockList.push_back(ObjBlock);
 
+    ObjBlock.x = 800;
+    ObjBlock.y -= 100;
+    ObjBlockList.push_back(ObjBlock);
 
     // ゴールフラッグ
-    SetObjParameter(&ObjGoalFlag, 1500, 0.0f, 0.0f, 0.0f, "Image/GoalFlag.png");
+    SetObjParameter(&ObjGoalFlag, STAGE_WIDTH - 200, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png");
     ObjGoalFlag.y = ObjGround.y - ObjGoalFlag.height;
 
     // モモタロー
-    SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo2.png");
+    SetObjParameter(&ObjMomo, 100, 0.0f, 5.0f, 0.0f, "Image/Momo/Momo.png");
     ObjMomo.y = ObjGround.y - ObjMomo.height;
 
     // HP
     string strHPpath = "";
     for (int i = 0; i < 5; i++) {
-        strHPpath = "Image/HP_" + std::to_string(i) + ".png";
+        strHPpath = "Image/Momo/HP_" + std::to_string(i) + ".png";
         nImgHP[i] = LoadGraph(strHPpath.c_str());
     }
-    int nTempH = 0; 
+    int nTempH = 0;
     GetGraphSize(nImgHP[0], &nHPWidth, &nTempH);
     nHPX = 20, nHPY = 20; // とりあえずの座標
     nCurrentHP = HP_MAX * 4;
     
     // 剣
-    SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Sword2.png");
+    SetObjParameter(&ObjSword, 0.0f, 0.0f, 0.0f, 0.0f, "Image/Momo/Sword.png");
     dSwordLength = ObjSword.width * 1.41;
     nAttackingTimer = 0;
     bIsAttacking = false;
@@ -151,26 +153,26 @@ void InitData()
 
     // 確認用
     // 敵1
-    SetObjParameter(&ObjEnemy1, 1000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy1.png");
+    SetObjParameter(&ObjEnemy1, 1000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy/Enemy1.png");
     ObjEnemy1.y += ObjEnemy1.height / 2;
     // 敵2
-    SetObjParameter(&ObjEnemy2, 1000, 100, 0.0f, 0.0f, "Image/Enemy2.png");
+    SetObjParameter(&ObjEnemy2, 1000, 100, 0.0f, 0.0f, "Image/Enemy/Enemy2.png");
     ObjEnemy2.y += ObjEnemy2.height / 2;
     // 敵3
-    SetObjParameter(&ObjEnemy3, 1100, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy3.png");
+    SetObjParameter(&ObjEnemy3, 1100, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy/Enemy3.png");
     ObjEnemy3.y += ObjEnemy3.height / 2;
     // 敵1がダメージを受けたとき用
-    nDamagedEnemy = LoadGraph("Image/DamagedEnemy1.png");
+    nDamagedEnemy = LoadGraph("Image/Enemy/DamagedEnemy1.png");
 
     ObjEnemyList[0] = ObjEnemy1;
     ObjEnemyList[1] = ObjEnemy2;
     ObjEnemyList[2] = ObjEnemy3;
 
     // ステージBGM
-    nStageBGM = LoadSoundMem("Sound/StageBGM.wav");
+    nStageBGM = LoadSoundMem("Sound/Stage/StageBGM.wav");
 
     // 斬撃BGM
-    nSlashBGM = LoadSoundMem("Sound/SlashBGM.wav");
+    nSlashBGM = LoadSoundMem("Sound/Momo/SlashBGM.wav");
 
 }
 
@@ -336,14 +338,21 @@ void DrawMomo()
         }
         // 天井判定
         if (ObjMomo.vy < 0) {
-            for (int i = 0; i < ObjBlockList.size(); i++) {
-                float fLandX = ObjBlockList[i].x;
-                float fLandY = ObjBlockList[i].y;
-                if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
-                    if (ObjBlockList[i].y + ObjBlockList[i].height <= fPrevTop && ObjMomo.y <= ObjBlockList[i].y + ObjBlockList[i].height) {
-                        ObjMomo.y = ObjBlockList[i].y + ObjBlockList[i].height;
-                        fMaxY = ObjGround.y;
-                        break;
+            // 画面外に出たか判定
+            if (fPrevTop >= 0 && ObjMomo.y < 0) {
+                ObjMomo.y = 0;
+                fMaxY = ObjGround.y;
+            }
+            else {
+                for (int i = 0; i < ObjBlockList.size(); i++) {
+                    float fLandX = ObjBlockList[i].x;
+                    float fLandY = ObjBlockList[i].y;
+                    if (fLandX <= ObjMomo.x + ObjMomo.width && ObjMomo.x <= fLandX + ObjBlockList[i].width) {
+                        if (ObjBlockList[i].y + ObjBlockList[i].height <= fPrevTop && ObjMomo.y <= ObjBlockList[i].y + ObjBlockList[i].height) {
+                            ObjMomo.y = ObjBlockList[i].y + ObjBlockList[i].height;
+                            fMaxY = ObjGround.y;
+                            break;
+                        }
                     }
                 }
             }
@@ -381,7 +390,7 @@ void SwordAttack()
 // 敵描画
 void DrawEnemy()
 {
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 3; i++) {
         if (nCameraX < ObjEnemyList[i].x && ObjEnemyList[i].x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
             if (nEnemyDamagedTimer == 0) {
                 DrawGraph(ObjEnemyList[i].x - nCameraX, ObjEnemyList[i].y, ObjEnemyList[i].img, TRUE);

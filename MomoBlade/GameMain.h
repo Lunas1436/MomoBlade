@@ -3,7 +3,7 @@
 #include <vector>
 
 // ステージ
-const int STAGE_WIDTH = 5000;
+const int STAGE_WIDTH = 3000;
 const int STAGE_HEIGHT = 600;
 
 // スクリーン
@@ -35,6 +35,14 @@ struct OBJECT
 	int height;
 };
 
+// class化すればよかった...
+struct ENEMY
+{
+	OBJECT obj;
+	bool bIsHit;
+	int nDmgTimer;
+};
+
 // ステージ描画
 OBJECT ObjSky;         // 空    
 OBJECT ObjGround;      // 地面
@@ -42,7 +50,6 @@ OBJECT ObjUnderGround; // 地中
 OBJECT ObjBlock;       // ブロック
 OBJECT ObjGoalFlag;    // ゴールフラッグ
 std::vector<OBJECT> ObjBlockList;    // ブロックリスト
-
 
 // BGM
 int nStageBGM; // ステージ
