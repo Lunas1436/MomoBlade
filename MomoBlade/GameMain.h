@@ -24,23 +24,37 @@ int nGameState = GAME_START;
 struct OBJECT
 {
 	// 座標(左上基準)
-	float x;       
+	float x; 
 	float y;
+
 	// 速度
 	float vx;
 	float vy;
+
 	// 画像情報
 	int img;
 	int width;
 	int height;
-};
 
-// class化すればよかった...
-struct ENEMY
-{
-	OBJECT obj;
+	// ヒットチェック用
+	// ↑の変数と命名規則を揃える
 	bool bIsHit;
 	int nDmgTimer;
+	int nDmgImg;
+};
+
+// 敵
+struct ENEMY
+{
+	OBJECT ObjEnemy;
+
+	// 通常時
+	int nImg_L;
+	int nImg_R;
+
+	// 被攻撃時
+	int nDmgImg_L;
+	int nDmgImg_R;
 };
 
 // ステージ描画
@@ -48,12 +62,18 @@ OBJECT ObjSky;         // 空
 OBJECT ObjGround;      // 地面
 OBJECT ObjUnderGround; // 地中
 OBJECT ObjBlock;       // ブロック
-OBJECT ObjGoalFlag;    // ゴールフラッグ
 std::vector<OBJECT> ObjBlockList;    // ブロックリスト
+OBJECT ObjGoalFlag;    // ゴールフラッグ
 
 // BGM
 int nStageBGM; // ステージ
 int nSlashBGM; // 斬撃
+
+// ヒットチェックの判定方式
+enum CollisionMode {
+	CM_AABB,          // 点と矩形→剣先と敵
+	CM_POINT_IN_RECT  // 矩形どうし→モモと敵
+};
 
 // モモタロー
 OBJECT ObjMomo;
@@ -63,28 +83,17 @@ float fMaxY = 0.0f;
 bool bOnLand = true;
 bool bOnGround = true;
 int nCameraX = 0; // モモを中心とするカメラのX座標
-bool bHitToMomo = false;
-int nMomoDamagedTimer = 0;
 
 // 剣
 OBJECT ObjSword;
 void SwordAttack();     // 斬撃モーション
-bool HitCheckToMomo();
-bool HitCheckToEnemy(); // 敵と剣先とのヒットチェック
 void DrawDamageToMomo();
 double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
-bool bIsAttacking;
-int nAttackingTimer;
 double dSwordAngle = 0;
 
 // 敵
-OBJECT ObjEnemy1;
-OBJECT ObjEnemy2;
-OBJECT ObjEnemy3;
 OBJECT ObjEnemyList[3];
-int nDamagedEnemy;
-bool bHitToEnemy = false;
-int nEnemyDamagedTimer = 0;
+int nDmgIndex = -1;
 void DrawDamageToEnemy();
 
 void InitData();
@@ -100,3 +109,6 @@ int nImgHP[5]; // ハートの画像(HP0～MAX)
 int nCurrentHP = HP_MAX * 4; // モモのHP(初期値MAX)
 int nHPX, nHPY, nHPWidth;
 
+void CollisionCheck();
+bool PointInRect(float fpx, float fpy, OBJECT ObjRect);
+bool AABBOverlap(OBJECT ObjRect1, OBJECT ObjRect2);
