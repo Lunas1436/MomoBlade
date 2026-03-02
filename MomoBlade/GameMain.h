@@ -48,11 +48,14 @@ struct ENEMY
 {
 	OBJECT ObjEnemy;
 
-	// 通常時
+	// X方向の移動範囲
+	float fRangeX;
+
+	// 通常時の画像
 	int nImg_L;
 	int nImg_R;
 
-	// 被攻撃時
+	// 被攻撃時の画像
 	int nDmgImg_L;
 	int nDmgImg_R;
 };
@@ -69,12 +72,6 @@ OBJECT ObjGoalFlag;    // ゴールフラッグ
 int nStageBGM; // ステージ
 int nSlashBGM; // 斬撃
 
-// ヒットチェックの判定方式
-enum CollisionMode {
-	CM_AABB,          // 点と矩形→剣先と敵
-	CM_POINT_IN_RECT  // 矩形どうし→モモと敵
-};
-
 // モモタロー
 OBJECT ObjMomo;
 const float GRAVITEY = 1.2f;
@@ -86,18 +83,21 @@ int nCameraX = 0; // モモを中心とするカメラのX座標
 
 // 剣
 OBJECT ObjSword;
-void SwordAttack();     // 斬撃モーション
-void DrawDamageToMomo();
 double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
 double dSwordAngle = 0;
+bool bIsAttacking = false;
+void SwordAttack();     // 斬撃モーション
+void DrawDamageToMomo();
 
 // 敵
-OBJECT ObjEnemyList[3];
+//OBJECT ObjEnemyList[3];
+ENEMY ObjEnemyList[3];
 int nDmgIndex = -1;
-void DrawDamageToEnemy();
+void DrawDamageToEnemy(ENEMY ObjDmgEnemy);
 
 void InitData();
 void SetObjParameter(OBJECT* pObj, float fx, float fy, float fvx, float fvy, const char* pchImg);
+void SetEnemyImgData();
 void DrawStage();
 void PlayerInput();
 
