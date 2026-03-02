@@ -50,6 +50,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // モモと剣描画
         DrawMomo();
 
+        // 敵移動
+        MoveEnemy();
+
         // 敵描画
         DrawEnemy();
         
@@ -122,12 +125,16 @@ void InitData()
     dSwordAngle = 0;
 
     // 敵
-    SetObjParameter(&ObjEnemyList[0].ObjEnemy, 1000, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy/Enemy1_L.png");
-    ObjEnemyList[0].ObjEnemy.y += ObjEnemyList[0].ObjEnemy.height / 2;
-    SetObjParameter(&ObjEnemyList[1].ObjEnemy, 1000, 100, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
-    ObjEnemyList[1].ObjEnemy.y += ObjEnemyList[1].ObjEnemy.height / 2;
-    SetObjParameter(&ObjEnemyList[2].ObjEnemy, 1100, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy/Enemy3_L.png");
-    ObjEnemyList[2].ObjEnemy.y += ObjEnemyList[2].ObjEnemy.height / 2;
+    SetObjParameter(&ObjEnemyList[0].Obj, 1000, ObjMomo.y, -2.5f, 0.0f, "Image/Enemy/Enemy1_L.png");
+    ObjEnemyList[0].Obj.y += ObjEnemyList[0].Obj.height / 2;
+    ObjEnemyList[0].nDirection = DIRECTION_L;
+    ObjEnemyList[0].fRangeL = 500;
+    ObjEnemyList[0].fRangeR = 1000;
+
+    SetObjParameter(&ObjEnemyList[1].Obj, 1000, 100, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
+    ObjEnemyList[1].Obj.y += ObjEnemyList[1].Obj.height / 2;
+    SetObjParameter(&ObjEnemyList[2].Obj, 1100, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy/Enemy3_L.png");
+    ObjEnemyList[2].Obj.y += ObjEnemyList[2].Obj.height / 2;
     
     // 敵の状態画像読込み
     SetEnemyImgData();
@@ -383,6 +390,22 @@ void SwordAttack()
 // 敵移動
 void MoveEnemy()
 {
+    // まずは各敵の挙動を決める
+
+    for (int i = 0; i < 3; i++) {
+        ENEMY* pEnemy = &ObjEnemyList[i];
+        pEnemy->Obj.x += pEnemy->Obj.vx;
+        if (pEnemy->Obj.x >= pEnemy->fRangeR) {
+            pEnemy->Obj.x = pEnemy->fRangeR;
+            pEnemy->Obj.vx *= -1;
+            pEnemy->nDirection = DIRECTION_L;
+        }
+        else if (pEnemy->Obj.x < pEnemy->fRangeL) {
+            pEnemy->Obj.x = pEnemy->fRangeL;
+            pEnemy->Obj.vx *= -1;
+            pEnemy->nDirection = DIRECTION_R;
+        }
+    }
 
 }
 
@@ -390,9 +413,15 @@ void MoveEnemy()
 void DrawEnemy()
 {
     for (int i = 0; i < 3; i++) {
-        if (nCameraX < ObjEnemyList[i].ObjEnemy.x && ObjEnemyList[i].ObjEnemy.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
+        if (nCameraX < ObjEnemyList[i].Obj.x && ObjEnemyList[i].Obj.x < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあるときに描画
             if (i == nDmgIndex) continue;
-            DrawGraph(ObjEnemyList[i].ObjEnemy.x - nCameraX, ObjEnemyList[i].ObjEnemy.y, ObjEnemyList[i].nImg_L, TRUE);
+            if (ObjEnemyList[i].nDirection == DIRECTION_L) {
+                DrawGraph(ObjEnemyList[i].Obj.x - nCameraX, ObjEnemyList[i].Obj.y, ObjEnemyList[i].nImg_L, TRUE);
+            }
+            else {
+                DrawGraph(ObjEnemyList[i].Obj.x - nCameraX, ObjEnemyList[i].Obj.y, ObjEnemyList[i].nImg_R, TRUE);
+            }
+            
         }
     }
 }
@@ -401,12 +430,12 @@ void DrawEnemy()
 void CollisionCheck()
 {
     // 剣先と敵
-    if (ObjEnemyList[nDmgIndex].ObjEnemy.bIsHit) {
-        ObjEnemyList[nDmgIndex].ObjEnemy.nDmgTimer++;
+    if (nDmgIndex >= 0 && ObjEnemyList[nDmgIndex].Obj.bIsHit) {
+        ObjEnemyList[nDmgIndex].Obj.nDmgTimer++;
         DrawDamageToEnemy(ObjEnemyList[nDmgIndex]); // 敵のダメージエフェクト
-        if (ObjEnemyList[nDmgIndex].ObjEnemy.nDmgTimer > 60) {
-            ObjEnemyList[nDmgIndex].ObjEnemy.nDmgTimer = 0;
-            ObjEnemyList[nDmgIndex].ObjEnemy.bIsHit = false;
+        if (ObjEnemyList[nDmgIndex].Obj.nDmgTimer > 60) {
+            ObjEnemyList[nDmgIndex].Obj.nDmgTimer = 0;
+            ObjEnemyList[nDmgIndex].Obj.bIsHit = false;
             nDmgIndex = -1;
         }
     }
@@ -415,10 +444,10 @@ void CollisionCheck()
             float fTipX = ObjSword.x + dSwordLength * cos(dSwordAngle);
             float fTipY = ObjSword.y + ObjSword.height + dSwordLength * sin(dSwordAngle);
             for (int i = 0; i < 3; i++) {
-                if (PointInRect(fTipX, fTipY, ObjEnemyList[i].ObjEnemy)) {
+                if (PointInRect(fTipX, fTipY, ObjEnemyList[i].Obj)) {
                     ObjSword.bIsHit = true;
                     nDmgIndex = i;
-                    ObjEnemyList[nDmgIndex].ObjEnemy.bIsHit = true;
+                    ObjEnemyList[nDmgIndex].Obj.bIsHit = true;
                 }
             }
         }
@@ -435,8 +464,8 @@ void CollisionCheck()
     }
     else {
         for (int i = 0; i < 3; i++) {
-            if (ObjEnemyList[i].ObjEnemy.bIsHit) continue;
-            if (AABBOverlap(ObjMomo, ObjEnemyList[i].ObjEnemy)) {
+            if (ObjEnemyList[i].Obj.bIsHit) continue;
+            if (AABBOverlap(ObjMomo, ObjEnemyList[i].Obj)) {
                 ObjMomo.nDmgTimer = 0; // 一応初期化
                 ObjMomo.bIsHit = true;
                 nCurrentHP--;
@@ -483,15 +512,21 @@ void DrawDamageToMomo()
 // 敵がダメージを受けたときの演出
 void DrawDamageToEnemy(ENEMY ObjDmgEnemy)
 {
-    DrawGraph(ObjDmgEnemy.ObjEnemy.x - nCameraX, ObjDmgEnemy.ObjEnemy.y, ObjDmgEnemy.nDmgImg_L, TRUE); // 被ダメージの敵描画
+    // 被ダメージの敵描画
+    if (ObjDmgEnemy.nDirection == DIRECTION_L) {
+        DrawGraph(ObjDmgEnemy.Obj.x - nCameraX, ObjDmgEnemy.Obj.y, ObjDmgEnemy.nDmgImg_L, TRUE);
+    }
+    else {
+        DrawGraph(ObjDmgEnemy.Obj.x - nCameraX, ObjDmgEnemy.Obj.y, ObjDmgEnemy.nDmgImg_R, TRUE);
+    }
 
-    //// ダメージ演出
+    // ダメージ演出
     SetDrawBlendMode(DX_BLENDMODE_ADD, 255);   // 色を加算する設定
     int col = GetColor(rand() % 256, rand() % 256, rand() % 256); // 確認用
-    DrawBox(ObjDmgEnemy.ObjEnemy.x - nCameraX, 
-            ObjDmgEnemy.ObjEnemy.y, 
-            ObjDmgEnemy.ObjEnemy.x - nCameraX + ObjDmgEnemy.ObjEnemy.width, 
-            ObjDmgEnemy.ObjEnemy.y + ObjDmgEnemy.ObjEnemy.height, 
+    DrawBox(ObjDmgEnemy.Obj.x - nCameraX, 
+            ObjDmgEnemy.Obj.y, 
+            ObjDmgEnemy.Obj.x - nCameraX + ObjDmgEnemy.Obj.width, 
+            ObjDmgEnemy.Obj.y + ObjDmgEnemy.Obj.height, 
             col, 
             TRUE);
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // 通常の描画に戻す 

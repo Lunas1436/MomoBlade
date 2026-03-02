@@ -44,12 +44,21 @@ struct OBJECT
 };
 
 // “G
+// “G‚ÌŒü‚¢‚Ä‚¢‚é•ûŒü
+enum {
+	DIRECTION_L,
+	DIRECTION_R
+};
 struct ENEMY
 {
-	OBJECT ObjEnemy;
+	OBJECT Obj;
 
 	// X•ûŒü‚ÌˆÚ“®”ÍˆÍ
-	float fRangeX;
+	float fRangeL;
+	float fRangeR;
+
+	// Œü‚¢‚Ä‚¢‚é•ûŒü
+	int nDirection;
 
 	// ’Êí‚Ì‰æ‘œ
 	int nImg_L;
@@ -102,6 +111,7 @@ void DrawStage();
 void PlayerInput();
 
 void DrawMomo();
+void MoveEnemy();
 void DrawEnemy();
 void DrawHP();
 const int HP_MAX = 3; // MAX‚ÌHP‚Íƒn[ƒg(HP)3ŒÂ
