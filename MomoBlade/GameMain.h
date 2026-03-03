@@ -53,12 +53,15 @@ struct ENEMY
 {
 	OBJECT Obj;
 
-	// X方向の移動範囲
+	// X方向の移動可能範囲
 	float fRangeL;
 	float fRangeR;
 
 	// 向いている方向
 	int nDirection;
+
+	float fDetectW; // 検知範囲。敵の位置から向いている方向にfDetectDistの範囲内にモモがいれば検知
+	bool bDetect; // 検知の有無
 
 	// 通常時の画像
 	int nImg_L;
@@ -68,6 +71,8 @@ struct ENEMY
 	int nDmgImg_L;
 	int nDmgImg_R;
 };
+
+int nDetectImg;
 
 // ステージ描画
 OBJECT ObjSky;         // 空    
@@ -112,6 +117,10 @@ void PlayerInput();
 
 void DrawMomo();
 void MoveEnemy();
+void MoveEnemy1();
+void MoveEnemy2();
+void MoveEnemy3();
+
 void DrawEnemy();
 void DrawHP();
 const int HP_MAX = 3; // MAXのHPはハート(HP)3個

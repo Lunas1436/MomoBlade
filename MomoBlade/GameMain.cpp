@@ -93,11 +93,7 @@ void InitData()
 
     // ブロック配置
     ObjBlock.x = 700;
-    ObjBlock.y -= 150;
-    ObjBlockList.push_back(ObjBlock);
-
-    ObjBlock.x = 800;
-    ObjBlock.y -= 100;
+    ObjBlock.y -= 75;
     ObjBlockList.push_back(ObjBlock);
 
     // ゴールフラッグ
@@ -131,17 +127,24 @@ void InitData()
     ObjEnemyList[0].fRangeL = 500;
     ObjEnemyList[0].fRangeR = 1000;
 
-    SetObjParameter(&ObjEnemyList[1].Obj, 1000, 100, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
+    SetObjParameter(&ObjEnemyList[1].Obj, 1050, 50, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
     ObjEnemyList[1].Obj.y += ObjEnemyList[1].Obj.height / 2;
+    ObjEnemyList[1].nDirection = DIRECTION_L;
+    ObjEnemyList[1].fDetectW = 300.0f;
+    ObjEnemyList[1].bDetect = false;
+
     SetObjParameter(&ObjEnemyList[2].Obj, 1100, ObjMomo.y, 0.0f, 0.0f, "Image/Enemy/Enemy3_L.png");
     ObjEnemyList[2].Obj.y += ObjEnemyList[2].Obj.height / 2;
     
     // 敵の状態画像読込み
     SetEnemyImgData();
 
+    // 「!」マーク
+    nDetectImg = LoadGraph("Image/Enemy/DetectMark.png");
+
+    // サウンド
     // ステージBGM
     nStageBGM = LoadSoundMem("Sound/Stage/StageBGM.wav");
-
     // 斬撃BGM
     nSlashBGM = LoadSoundMem("Sound/Momo/SlashBGM.wav");
 
@@ -391,21 +394,58 @@ void SwordAttack()
 void MoveEnemy()
 {
     // まずは各敵の挙動を決める
+    // 敵1→単純な往復
+    // 敵2→モモを検知したら攻撃してくる→その場からは動かない
+    // 敵3→モモを検知したら突進してくる
+    MoveEnemy1();
+    MoveEnemy2();
 
-    for (int i = 0; i < 3; i++) {
-        ENEMY* pEnemy = &ObjEnemyList[i];
-        pEnemy->Obj.x += pEnemy->Obj.vx;
-        if (pEnemy->Obj.x >= pEnemy->fRangeR) {
-            pEnemy->Obj.x = pEnemy->fRangeR;
-            pEnemy->Obj.vx *= -1;
+}
+
+// 敵1の挙動
+void MoveEnemy1()
+{
+    ENEMY* pEnemy = &ObjEnemyList[0];
+    pEnemy->Obj.x += pEnemy->Obj.vx;
+    if (pEnemy->Obj.x >= pEnemy->fRangeR) {
+        pEnemy->Obj.x = pEnemy->fRangeR;
+        pEnemy->Obj.vx *= -1;
+        pEnemy->nDirection = DIRECTION_L;
+    }
+    else if (pEnemy->Obj.x < pEnemy->fRangeL) {
+        pEnemy->Obj.x = pEnemy->fRangeL;
+        pEnemy->Obj.vx *= -1;
+        pEnemy->nDirection = DIRECTION_R;
+    }
+}
+
+// 敵2の挙動
+void MoveEnemy2()
+{
+    ENEMY* pEnemy = &ObjEnemyList[1];
+    pEnemy->bDetect = false; // 確認用
+    if (pEnemy->nDirection == DIRECTION_L) {
+        if (pEnemy->Obj.y - 50 <= ObjMomo.y && ObjMomo.y <= pEnemy->Obj.y + pEnemy->Obj.height + 20) {
+            if (pEnemy->Obj.x - pEnemy->fDetectW <= ObjMomo.x && ObjMomo.x <= pEnemy->Obj.x) {
+                pEnemy->bDetect = true;
+            }
+        }
+    }
+
+    if (pEnemy->bDetect) { // モモがいる方向を向く
+        if (pEnemy->Obj.x >= ObjMomo.x) {
             pEnemy->nDirection = DIRECTION_L;
         }
-        else if (pEnemy->Obj.x < pEnemy->fRangeL) {
-            pEnemy->Obj.x = pEnemy->fRangeL;
-            pEnemy->Obj.vx *= -1;
+        else {
             pEnemy->nDirection = DIRECTION_R;
         }
     }
+}
+
+// 敵3の挙動
+void MoveEnemy3()
+{
+
 
 }
 
@@ -417,11 +457,18 @@ void DrawEnemy()
             if (i == nDmgIndex) continue;
             if (ObjEnemyList[i].nDirection == DIRECTION_L) {
                 DrawGraph(ObjEnemyList[i].Obj.x - nCameraX, ObjEnemyList[i].Obj.y, ObjEnemyList[i].nImg_L, TRUE);
+                if (ObjEnemyList[i].bDetect) { 
+                    // モモを検知した場合、「!」マークを描画
+                    DrawGraph(ObjEnemyList[i].Obj.x - nCameraX - 35, ObjEnemyList[i].Obj.y - 20, nDetectImg, TRUE);
+                }
             }
             else {
                 DrawGraph(ObjEnemyList[i].Obj.x - nCameraX, ObjEnemyList[i].Obj.y, ObjEnemyList[i].nImg_R, TRUE);
+                if (ObjEnemyList[i].bDetect) {
+                    // モモを検知した場合、「!」マークを描画
+                    DrawGraph(ObjEnemyList[i].Obj.x - nCameraX + 35, ObjEnemyList[i].Obj.y - 20, nDetectImg, TRUE);
+                }
             }
-            
         }
     }
 }
