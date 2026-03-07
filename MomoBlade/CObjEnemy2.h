@@ -1,20 +1,17 @@
 #pragma once
 #include "CObjEnemy.h"
 
-class CObjEnemy1 : public CObjEnemy
+class CObjEnemy2 : public CObjEnemy
 {
 public:
-	CObjEnemy1();
+	CObjEnemy2();
 
 public:
-	void InitEnmey(float fRangeL, float fRangeR, float fDetectW, const char* pchImg);
+	void InitEnmey(float fDetectW, const char* pchImg);
 	void Update();
-	void Draw();
+	void Draw(int nCameraX) override;
 
 private:
-	// X方向の移動可能範囲
-	float m_fRangeL;
-	float m_fRangeR;
 	float m_fDetectW;  // 検知範囲。敵の位置から向いている方向にfDetectDistの範囲内にモモがいれば検知
 	bool m_bDetect;    // 検知の有無
 	int m_nImgDetect;  // 「!」マーク画像

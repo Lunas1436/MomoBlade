@@ -9,20 +9,18 @@ CObjEnemy::CObjEnemy()
 	m_nDmgImg_R = -1;
 }
 
-// 敵の画像セット
-void CObjEnemy::SetImages(const char* pchImgL, const char* pchImgR, const char* pchDmgL, const char* pchDmgR)
+void CObjEnemy::Update()
 {
-	if (pchImgL) {
-		m_nImg_L = LoadGraph(pchImgL);
-	}
-	if (pchImgL) {
-		m_nImg_R = LoadGraph(pchImgR);
-	}
-	if (pchImgL) {
-		m_nDmgImg_L = LoadGraph(pchDmgL);
-	}
-	if (pchImgL) {
-		m_nDmgImg_R = LoadGraph(pchDmgR);
+
+}
+
+void CObjEnemy::CheckPointInRect(float fx, float fy, int nCameraX)
+{
+	if (fx >= m_fx - nCameraX && fx <= m_fx - nCameraX + m_nWidth &&
+		fy >= m_fy && fy <= m_fy + m_nHeight) 
+	{
+		// 剣先の座標が敵矩形内にある場合は敵が攻撃を受けたとみなす
+		m_bDamaged = true;
 	}
 }
 

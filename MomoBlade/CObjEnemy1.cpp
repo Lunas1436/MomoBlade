@@ -22,5 +22,31 @@ void CObjEnemy1::InitEnmey(float fRangeL, float fRangeR, float fDetectW, const c
 	}
 }
 
+void CObjEnemy1::Update()
+{
+	// 左右の往復移動
+	m_fx += m_fvx;
+	if (m_fx >= m_fRangeR) {
+		m_fx = m_fRangeR;
+		m_fvx *= -1;
+		m_nDirection = DIRECTION_L;
+		m_nCurrentImg = m_nImg_L;
+	}
+	else if (m_fx < m_fRangeL) {
+		m_fx = m_fRangeL;
+		m_fvx *= -1;
+		m_nDirection = DIRECTION_R;
+		m_nCurrentImg = m_nImg_R;
+	}
+}
+
+void CObjEnemy1::Draw()
+{
+
+
+}
+
+
+
 
 

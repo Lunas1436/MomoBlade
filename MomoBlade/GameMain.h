@@ -3,7 +3,10 @@
 #include "DxLib.h" // 冗長
 #include "CObject.h"
 #include "CObjMomo.h"
-#include "CObjEnemy.h"
+#include "CObjSword.h"
+#include "CObjEnemy1.h"
+#include "CObjEnemy2.h"
+//#include "CObjEnemy3.h"
 #include <vector>
 
 // ステージ
@@ -37,37 +40,26 @@ int m_nOnIndex;
 
 // BGM
 int nStageBGM; // ステージ
-int nSlashBGM; // 斬撃
 
 // モモタロー
 CObjMomo ObjMomo;
-const float GRAVITEY = 1.2f;
-const float JUMP_UP_POWER = 0.8f;
 int nCameraX = 0; // モモを中心とするカメラのX座標
 
 // 剣
-CObject ObjSword;
-double dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
-double dSwordAngle = 0;
-bool bIsAttacking = false;
-void SwordAttack();     // 斬撃モーション
-void DrawDamageToMomo();
+CObjSword ObjSword;
 
 // 敵
 CObjEnemy ObjEnemyList[3];
-int nDmgIndex = -1;
+CObjEnemy1 ObjEnemy1;
+
 void DrawDamageToEnemy(CObjEnemy ObjDmgEnemy);
 
 void InitData();
-void SetEnemyImgData();
 void DrawStage();
 void PlayerInput();
 
 void DrawMomo();
-void MoveEnemy();
-void MoveEnemy1();
-void MoveEnemy2();
-void MoveEnemy3();
+void UpdateEnemy();
 
 void DrawEnemy();
 void DrawHP();
@@ -77,5 +69,3 @@ int nCurrentHP = HP_MAX * 4; // モモのHP(初期値MAX)
 int nHPX, nHPY, nHPWidth;
 
 void CollisionCheck();
-bool PointInRect(float fpx, float fpy, CObject ObjRect);
-bool AABBOverlap(CObject ObjRect1, CObject ObjRect2);
