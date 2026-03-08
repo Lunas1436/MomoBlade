@@ -2,44 +2,55 @@
 
 CObjEnemy2::CObjEnemy2()
 {
-	m_fDetectW = 0.0f;
-	m_bDetect = false;
-	m_nImgDetect = -1;
+}
+
+void CObjEnemy2::InitWeapon(const char* pchImg1, const char* pchImg2)
+{
+    // 弓
+    m_ObjBow.SetParameter(0.0f, 0.0f, 0.0f, 0.0f, pchImg1);
+    m_ObjBow.SetX(m_fx - m_ObjBow.GetWidth());
+    m_ObjBow.SetY(m_fy + m_nHeight / 2 - (m_ObjBow.GetHeight() / 2.0));
+
+    // 矢
+    m_ObjArrow.SetParameter(0.0f, 0.0f, 0.0f, 0.0f, pchImg2);
+    m_ObjArrow.SetX(m_ObjBow.GetX());
+    m_ObjArrow.SetY(m_ObjBow.GetY() + (m_ObjBow.GetHeight() / 2.0) - (m_ObjArrow.GetHeight() / 2.0));
+}
+
+void CObjEnemy2::Update(float fx, float fy)
+{
+    CObjEnemy::Update(fx, fy);
+
+    // モモがいる方向を向く
+    if (m_bDetect) {
+        if (m_fx >= fx) {
+            SetDirection(DIRECTION_L);
+        }
+        else {
+            SetDirection(DIRECTION_R);
+        }
+    }
+}
+
+void CObjEnemy2::Attack(float fx, float fy)
+{
+    // 弓矢の座標とモモの座標を用いて矢を放つ
+    Arrow(fx, fy);
 
 }
 
-void CObjEnemy2::InitEnmey(float fDetectW, const char* pchImg)
+void CObjEnemy2::Arrow(float fx, float fy)
 {
-	m_fDetectW = fDetectW;
-	if (pchImg != nullptr) {
-		m_nImgDetect = LoadGraph(pchImg);
-	}
 
-}
-
-void CObjEnemy2::Update()
-{
-    //if (pEnemy->Obj.y - 50 <= ObjMomo.y && ObjMomo.y <= pEnemy->Obj.y + pEnemy->Obj.height + 20) {
-    //    if (pEnemy->Obj.x - pEnemy->fDetectW <= ObjMomo.x && ObjMomo.x <= pEnemy->Obj.x) {
-    //        pEnemy->bDetect = true;
-    //    }
-    //}
-
-    //if (m_bDetect) { // モモがいる方向を向く
-    //    if (pEnemy->Obj.x >= ObjMomo.x) {
-    //        m_nDirection = DIRECTION_L;
-    //    }
-    //    else {
-    //        m_nDirection = DIRECTION_R;
-    //    }
-    //}
 }
 
 void CObjEnemy2::Draw(int nCameraX)
 {
 	CObject::Draw(nCameraX);
-
-	// ！マーク描画
+    
+    // 弓矢描画
+    DrawGraph(m_ObjBow.GetX() - nCameraX, m_ObjBow.GetY(), m_ObjBow.GetImg(), TRUE);
+    DrawGraph(m_ObjArrow.GetX() - nCameraX, m_ObjArrow.GetY(), m_ObjArrow.GetImg(), TRUE);
 
 }
 

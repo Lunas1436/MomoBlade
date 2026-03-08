@@ -1,9 +1,9 @@
 #include "GameMain.h"
 
+
 #include <string>
 #include <cmath>
 
-using namespace std;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -28,25 +28,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         // ステージ描画
         DrawStage();
 
-        // HP描画
-        DrawHP();
-
         // プレイヤー入力
         PlayerInput();
 
         // カメラ座標(モモを中心)
-        //nCameraX = (ObjMomo.m_fx + ObjMomo.width / 2) - SCREEN_WIDTH / 2;
-        //if (nCameraX < 0) {
-        //    nCameraX = 0;
-        //}
-        //else if (nCameraX + SCREEN_WIDTH > STAGE_WIDTH) {
-        //    nCameraX = STAGE_WIDTH - SCREEN_WIDTH;
-        //}
+        nCameraX = (ObjMomo.GetX() + ObjMomo.GetWidth() / 2) - SCREEN_WIDTH / 2;
+        if (nCameraX < 0) {
+            nCameraX = 0;
+        }
+        else if (nCameraX + SCREEN_WIDTH > STAGE_WIDTH) {
+            nCameraX = STAGE_WIDTH - SCREEN_WIDTH;
+        }
 
-        // モモと剣描画
-        DrawMomo();
+        // モモ描画
+        DrawMomo(); // モモのメンバ関数にする
+        // 剣描画
+        ObjMomo.DrawSword(nCameraX);
+        // HP描画
+        ObjMomo.DrawHP();
 
-        // 敵移動
+        // 敵更新
         UpdateEnemy();
 
         // 敵描画
@@ -59,6 +60,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         if (ProcessMessage() == -1) break; // Windowsから情報を受け取りエラーが起きたら終了
         if (CheckHitKey(KEY_INPUT_ESCAPE) == 1) break; // ESCキーが押されたら終了
     }
+
+    // 動的確保した敵オブジェクトの解放
+    for (int i = 0; i < m_ObjEnemyList.size(); i++) {
+        delete m_ObjEnemyList[i];
+    }
+    m_ObjEnemyList.clear();
 
     DxLib_End(); // ＤＸライブラリ使用の終了処理
     return 0;
@@ -76,6 +83,7 @@ void InitData()
     // 地面
     ObjGround.SetParameter(0.0f, 0.0f, 0.0f, 0.0f, "Image/Stage/Ground.png");
     ObjGround.SetY(SCREEN_HEIGHT - ObjGround.GetHeight() * 3);
+    nGroundY = ObjGround.GetY();
 
     // 地中
     ObjUnderGround.SetParameter(ObjGround.GetX(), 0.0f, 0.0f, 0.0f, "Image/Stage/UnderGround.png");
@@ -90,83 +98,62 @@ void InitData()
     ObjGoalFlag.SetY(ObjGround.GetY() - ObjGoalFlag.GetHeight());
 
     // モモタロー
-    ObjMomo.SetParameter(100, 0.0f, 5.0f, 0.0f, "Image/Momo/Momo.png");
+    ObjMomo.SetParameter(100, 0.0f, 5.0f, 0.0f, "Image/Momo/Momo_R.png");
     ObjMomo.SetImages(
-        "Image/Momo/Momo.png",
-        "Image/Momo/Momo.png",
-        "Image/Momo/Momo.png",
-        "Image/Momo/Momo.png"
+        "Image/Momo/Momo_L.png",
+        "Image/Momo/Momo_R.png",
+        "Image/Momo/Momo_L.png",
+        "Image/Momo/Momo_R.png"
     );
-    ObjMomo.SetY(ObjGround.GetY() - ObjMomo.GetHeight());
+    ObjMomo.SetY(nGroundY - ObjMomo.GetHeight());
+    ObjMomo.SetOnLand(true);
+    ObjMomo.SetOnGround(true);
+    ObjMomo.SetDirection(DIRECTION_R);
     
     // 剣
-    ObjSword.SetParameter(0.0f, 0.0f, 0.0f, 0.0f, "Image/Momo/Sword.png");
-    ObjSword.SetImages(
-        "Image/Momo/Sword.png",
-        "Image/Momo/Sword.png",
-        "Image/Momo/Sword.png",
-        "Image/Momo/Sword.png"
-    );
-    ObjSword.SetSwordAngle(ObjSword.GetWidth() * 1.41);
+    ObjMomo.InitSword(0.0f, 0.0f, 0.0f, 0.0f, "Image/Momo/Sword_L.png", "Image/Momo/Sword_R.png");
 
     // HP
-    string strHPpath = "";
-    for (int i = 0; i < 5; i++) {
-        strHPpath = "Image/Momo/HP_" + std::to_string(i) + ".png";
-        nImgHP[i] = LoadGraph(strHPpath.c_str());
-    }
-    int nTempH = 0;
-    GetGraphSize(nImgHP[0], &nHPWidth, &nTempH);
-    nHPX = 20, nHPY = 20; // とりあえずの座標
-    nCurrentHP = HP_MAX * 4;
+    vector<filesystem::path> pathList;
+    pathList.push_back("Image/Momo/HP_0.png");
+    pathList.push_back("Image/Momo/HP_1.png");
+    pathList.push_back("Image/Momo/HP_2.png");
+    pathList.push_back("Image/Momo/HP_3.png");
+    pathList.push_back("Image/Momo/HP_4.png");
+    ObjMomo.InitHP(20.0, 20.0, "Image/Momo/HP.png", pathList);
 
-    // 敵1   
-    ObjEnemyList[0].SetParameter(0.0f, 0.0f, 0.0f, 0.0f, "Image/Enemy/Enemy1_L.png");
-    ObjEnemyList[0].SetY(ObjEnemyList[0].GetY() + ObjEnemyList[0].GetHeight() / 2);
-    ObjEnemyList[0].SetImages(
+    // 敵1
+    CObjEnemy1* pEnemy1 = new CObjEnemy1();
+    pEnemy1->SetParameter(1000.0f, 0.0f, 3.0f, 0.0f, "Image/Enemy/Enemy1_L.png");
+    pEnemy1->SetY(nGroundY - pEnemy1->GetHeight());
+    pEnemy1->SetImages(
         "Image/Enemy/Enemy1_L.png",
         "Image/Enemy/Enemy1_R.png",
         "Image/Enemy/Enemy1_Damaged_L.png",
         "Image/Enemy/Enemy1_Damaged_R.png"
     );
+    pEnemy1->InitEnmey(500.0f, 1000.0f, 300, nullptr);
+    m_ObjEnemyList.push_back(pEnemy1);
 
     // 敵2
-    ObjEnemyList[1].SetParameter(1100, 50, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
-    ObjEnemyList[1].SetY(ObjEnemyList[1].GetY() + ObjEnemyList[1].GetHeight() / 2);
-    ObjEnemyList[1].SetImages(
+    CObjEnemy2* pEnemy2 = new CObjEnemy2();
+    pEnemy2->SetParameter(1100, 50, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
+    //pEnemy2->SetY(pEnemy2->GetY() + pEnemy2->GetHeight() / 2);
+    pEnemy2->SetImages(
         "Image/Enemy/Enemy2_L.png",
         "Image/Enemy/Enemy2_R.png",
         "Image/Enemy/Enemy2_Damaged_L.png",
         "Image/Enemy/Enemy2_Damaged_R.png"
-    ); 
+    );
+    pEnemy2->InitWeapon(
+        "Image/Enemy/Bow.png",
+        "Image/Enemy/Arrow.png"
+    );
+    m_ObjEnemyList.push_back(pEnemy2);
 
     // サウンド
     // ステージBGM
     nStageBGM = LoadSoundMem("Sound/Stage/StageBGM.wav");
-}
-
-// HP更新
-void DrawHP()
-{
-    int nFullHP = nCurrentHP / 4;
-    int nLeftHP = nCurrentHP % 4;
-    int nNonHP = (HP_MAX * 4 - nCurrentHP) / 4;
-
-    int i = 0;
-    // フルHP
-    for (i = 0; i < nFullHP; i++) {
-        DrawGraph(nHPX + nHPWidth * i, nHPY, nImgHP[4], TRUE);
-    }
-
-    // 
-    if (nLeftHP > 0) {
-        DrawGraph(nHPX + nHPWidth * i, nHPY, nImgHP[nLeftHP], TRUE);
-        i++;
-    }
-
-    for (int j = 0; j < nNonHP; j++) {
-        DrawGraph(nHPX + nHPWidth * (i + j), nHPY, nImgHP[0], TRUE);
-    }
 }
 
 // ステージ描画
@@ -200,21 +187,14 @@ void DrawStage()
 // プレイヤー入力
 void PlayerInput()
 {
-    float fPrevX = ObjMomo.GetX();
-
     // →キー
     if (CheckHitKey(KEY_INPUT_RIGHT)) {
-        ObjMomo.AddX(ObjMomo.GetVx());
-        ObjMomo.SetDirection(DIRECTION_L);
+        ObjMomo.MoveMomo(DIRECTION_R);
     }
 
     // ←キー
     if (CheckHitKey(KEY_INPUT_LEFT)) {
-        ObjMomo.AddX((-1)* ObjMomo.GetVx());
-        ObjMomo.SetDirection(DIRECTION_R);
-        if (ObjMomo.GetX() < 0) {
-            ObjMomo.SetX(0.0f);
-        }
+        ObjMomo.MoveMomo(DIRECTION_L);
     }
 
     // ↑キー
@@ -228,8 +208,8 @@ void PlayerInput()
 
     // スペースキー
     if (CheckHitKey(KEY_INPUT_SPACE)) {
-        if (!ObjSword.IsAttack()) {
-            ObjSword.SetAttack(true);
+        if (!ObjMomo.IsAttacking()) {
+            ObjMomo.SetIsAttacking(true);
         }
     }
 }
@@ -238,9 +218,9 @@ void PlayerInput()
 void DrawMomo()
 {
     // モモがオブジェクト上に乗っている
-    if (ObjMomo.IsOnLand()) { 
+    if (ObjMomo.IsOnLand()) {
         if (!ObjMomo.IsOnGround()) { // 地面以外のオブジェクト上にいる
-            if (!ObjMomo.IsMomoInRangeObjectX(ObjBlockList[m_nOnIndex])) { // オブジェクトのX範囲外に出たとき
+            if (m_nOnIndex >= 0 && !ObjMomo.IsMomoInRangeObjectX(ObjBlockList[m_nOnIndex])) { // オブジェクトのX範囲外に出たとき
                 m_nOnIndex = -1;
                 for (int i = 0; i < ObjBlockList.size(); i++) {
                     if (ObjMomo.IsMomoInRangeObjectX(ObjBlockList[i])) {
@@ -260,14 +240,12 @@ void DrawMomo()
     else {
         float fPrevTop = ObjMomo.GetY();
         float fPrevBottom = fPrevTop + ObjMomo.GetHeight();
-
         ObjMomo.CalcMomoVy(); // ジャンプUP or DOWNの速度計算
         float fNextTop = ObjMomo.GetY() + ObjMomo.GetVy();
         float fNextBottom = fNextTop + ObjMomo.GetHeight();
-        //ObjMomo.y += ObjMomo.vy;
 
-        // 着地判定
-        if (ObjMomo.GetVy() > 0) {
+        // ジャンプDOWN
+        if (ObjMomo.GetVy() > 0) { // 着地判定
             // まず地面の上にいるか判定
             if (fPrevBottom <= ObjGround.GetY() && ObjGround.GetY() <= fNextBottom) {
                 //ObjMomo.SetY(ObjGround.GetY() - ObjMomo.GetHeight());
@@ -286,14 +264,15 @@ void DrawMomo()
                             ObjMomo.SetY(fLandY - ObjMomo.GetHeight());
                             ObjMomo.SetOnLand(true);
                             ObjMomo.SetVy(0.0f);
+                            m_nOnIndex = i;
                             break;
                         }
                     }
                 }
             }   
         }
-        // 天井判定
-        if (ObjMomo.GetVy() < 0) {
+        // ジャンプUP
+        if (ObjMomo.GetVy() < 0) { // 天井判定
             // 画面外に出たか判定
             if (fPrevTop >= 0 && fNextTop < 0) {
                 //ObjMomo.SetY(0.0f);
@@ -302,17 +281,23 @@ void DrawMomo()
             }
             else {
                 // オブジェクトにモモの頭が直撃するか判定
-                for (int i = 0; i < ObjBlockList.size(); i++) {
-                    float fLandY = ObjBlockList[i].GetY();
-                    if (ObjMomo.IsMomoInRangeObjectX(ObjBlockList[i])) {
-                        float fBlockTop = ObjBlockList[i].GetY() + ObjBlockList[i].GetHeight();
-                        if (fBlockTop <= fPrevTop && fNextTop <= fBlockTop) {
-                            ObjMomo.SetY(fBlockTop);
-                            ObjMomo.SetDestY(ObjGround.GetY());
-                            break;
-                        }
+                if (m_nOnIndex >= 0 && ObjMomo.IsMomoInRangeObjectX(ObjBlockList[m_nOnIndex])) {
+                    float fBlockTop = ObjBlockList[m_nOnIndex].GetY() + ObjBlockList[m_nOnIndex].GetHeight();
+                    if (fBlockTop <= fPrevTop && fNextTop <= fBlockTop) {
+                        fNextTop = fBlockTop;
+                        //ObjMomo.SetY(fBlockTop);
+                        ObjMomo.SetDestY(ObjGround.GetY());
                     }
                 }
+                else {
+                    float fDestY = ObjMomo.GetDestY();
+                    if (fDestY <= fPrevTop && fNextTop <= fDestY) { // 最高点までジャンプした
+                        fNextTop = fDestY;
+                        //ObjMomo.SetY(fDestY);
+                        ObjMomo.SetDestY(ObjGround.GetY());
+                    }
+                }
+
             }
         }
 
@@ -322,33 +307,30 @@ void DrawMomo()
 
     // モモ描画
     ObjMomo.Draw(nCameraX);
-
-    // 剣描画
-    ObjSword.SetX(ObjMomo.GetX() - nCameraX + ObjMomo.GetWidth() + 10);
-    ObjSword.SetY(ObjMomo.GetY() - 20);
-    ObjSword.DrawSword();
 }
 
-// 敵移動
+// 敵更新
 void UpdateEnemy()
 {
     // まずは各敵の挙動を決める
     // 敵1→単純な往復
     // 敵2→モモを検知したら攻撃してくる→その場からは動かない
     // 敵3→モモを検知したら突進してくる
-    for (int i = 0; i < 3; i++) {
-        ObjEnemyList[i].Update();
+    float fMomoX = ObjMomo.GetX();
+    float fMomoY = ObjMomo.GetY();
+    for (int i = 0; i < m_ObjEnemyList.size(); i++) {
+        m_ObjEnemyList[i]->Update(fMomoX, fMomoY);
+        m_ObjEnemyList[i]->Attack(fMomoX, fMomoY);
     }
-
 }
 
 // 敵描画
 void DrawEnemy()
 {
-    for (int i = 0; i < 3; i++) {
-        float fEnemyX = ObjEnemyList[i].GetX();
+    for (int i = 0; i < m_ObjEnemyList.size(); i++) {
+        float fEnemyX = m_ObjEnemyList[i]->GetX();
         if (nCameraX < fEnemyX && fEnemyX < nCameraX + SCREEN_WIDTH) { // ウィンドウ内にあれば描画
-            ObjEnemyList[i].Draw(nCameraX);
+            m_ObjEnemyList[i]->Draw(nCameraX);
         }
     }
 }
@@ -358,18 +340,22 @@ void CollisionCheck()
 {
     // 剣先と敵
     // 全員のDamagedフラグを見る
-    for (int i = 0; i < 3; i++) {
-        if (ObjEnemyList[i].IsDamaged()) {
-            ObjEnemyList[i].DamagedCheck();
+    for (int i = 0; i < m_ObjEnemyList.size(); i++) {
+        if (m_ObjEnemyList[i]->IsDamaged()) {
+            if (m_ObjEnemyList[i]->DamagedCheck()) {
+                m_ObjEnemyList[i]->DrawDamaged(nCameraX);
+            }
         }
     }
 
-    if (ObjSword.IsAttack()) {
+    if (ObjMomo.IsAttacking()) {
         float fTipX, fTipY;
-        ObjSword.CalcSwordTipXY(&fTipX, &fTipY);
-        for (int i = 0; i < 3; i++) {
-            if (!ObjEnemyList[i].IsDamaged()) {
-                ObjEnemyList[i].CheckPointInRect(fTipX, fTipY, nCameraX);
+        ObjMomo.CalcSwordTipXY(&fTipX, &fTipY);
+        for (int i = 0; i < m_ObjEnemyList.size(); i++) {
+            if (!m_ObjEnemyList[i]->IsDamaged()) {
+                if (m_ObjEnemyList[i]->CheckPointInRect(fTipX, fTipY, nCameraX)) {
+                    m_ObjEnemyList[i]->SetDamaged(true);
+                }
             }
         }
     }
@@ -379,36 +365,16 @@ void CollisionCheck()
         ObjMomo.DrawDamaged(nCameraX);
     }
     else {
-        for (int i = 0; i < 3; i++) {
-            if (ObjMomo.AABBOverlap(ObjEnemyList[i])) {
+        for (int i = 0; i < m_ObjEnemyList.size(); i++) {
+            if (ObjMomo.AABBOverlap(*m_ObjEnemyList[i])) {
                 ObjMomo.SetDamaged(true);
-                nCurrentHP--;
+                if (!ObjMomo.SubstractHP(1)) {
+                    // ゲームオーバー
+                    nGameState = GAME_OVER;
+                }
             }
         }
     }
 }
-
-//// 敵がダメージを受けたときの演出
-//void DrawDamageToEnemy(ENEMY ObjDmgEnemy)
-//{
-//    // 被ダメージの敵描画
-//    if (ObjDmgEnemy.nDirection == DIRECTION_L) {
-//        DrawGraph(ObjDmgEnemy.Obj.x - nCameraX, ObjDmgEnemy.Obj.y, ObjDmgEnemy.nDmgImg_L, TRUE);
-//    }
-//    else {
-//        DrawGraph(ObjDmgEnemy.Obj.x - nCameraX, ObjDmgEnemy.Obj.y, ObjDmgEnemy.nDmgImg_R, TRUE);
-//    }
-//
-//    // ダメージ演出
-//    SetDrawBlendMode(DX_BLENDMODE_ADD, 255);   // 色を加算する設定
-//    int col = GetColor(rand() % 256, rand() % 256, rand() % 256); // 確認用
-//    DrawBox(ObjDmgEnemy.Obj.x - nCameraX, 
-//            ObjDmgEnemy.Obj.y, 
-//            ObjDmgEnemy.Obj.x - nCameraX + ObjDmgEnemy.Obj.width, 
-//            ObjDmgEnemy.Obj.y + ObjDmgEnemy.Obj.height, 
-//            col, 
-//            TRUE);
-//    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // 通常の描画に戻す 
-//}
 
 

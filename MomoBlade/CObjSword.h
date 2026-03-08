@@ -1,5 +1,6 @@
 #pragma once
 #include "CObject.h"
+#include <DxLib.h>
 
 class CObjSword : public CObject
 {
@@ -8,9 +9,11 @@ public:
 	CObjSword();
 
 public:
-	void SetIsAttacking(bool bIsAttaking);
+	bool IsAttack();
+
 	void SetSwordLength(double dLength);
 	void SetSwordAngle(double dAngle);
+	void SetAttack(bool bAttack);
 
 	void DrawSword();
 	void SwordAttack();
@@ -19,8 +22,7 @@ public:
 private:
 	double m_dSwordLength;    // 剣の長さ→ヒットチェックの際、剣を線分として扱う
 	double m_dSwordAngle = 0;
-	bool m_bIsAttacking = false;
-
+	bool m_bAttack = false;
 	int m_nSlashBGM;
 
 };

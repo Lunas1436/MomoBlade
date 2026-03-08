@@ -3,25 +3,68 @@
 CObjEnemy::CObjEnemy()
 {
 	m_nDirection = DIRECTION_L;
-	m_nImg_L = -1;
-	m_nImg_R = -1;
-	m_nDmgImg_L = -1;
-	m_nDmgImg_R = -1;
+
+	m_fRangeL = 0.0f;
+	m_fRangeR = 0.0f;
+	m_fDetectW = 0.0f;
+	m_bDetect = false;
+	m_nImgDetect = -1;
 }
 
-void CObjEnemy::Update()
+// 敵初期化
+void CObjEnemy::InitEnmey(float fRangeL, float fRangeR, float fDetectW, const char* pchImg)
+{
+	m_fRangeL = fRangeL;
+	m_fRangeR = fRangeR;
+	m_fDetectW = fDetectW;
+	if (pchImg != nullptr) {
+		m_nImgDetect = LoadGraph(pchImg);
+	}
+}
+
+void CObjEnemy::Update(float fx, float fy)
+{
+	if (m_bDamaged) {
+		if (m_nDirection == DIRECTION_L) {
+			m_nCurrentImg = m_nDmgImg_L;
+		}
+		else {
+			m_nCurrentImg = m_nDmgImg_R;
+		}
+	}
+	else {
+		if (m_nDirection == DIRECTION_L) {
+			m_nCurrentImg = m_nImg_L;
+		}
+		else {
+			m_nCurrentImg = m_nImg_R;
+		}
+	}
+
+	m_bDetect = false;
+	if (m_fy - 50 <= fy && fy <= m_fy + m_nHeight + 20) {
+		if (m_fx - m_fDetectW <= fx && fx <= m_fx) {
+			DrawGraph(m_fx - 60, m_fy - 60, m_nImgDetect, TRUE);
+			m_bDetect = true;
+		}
+	}
+}
+
+void CObjEnemy::Attack(float fx, float fy)
 {
 
 }
 
-void CObjEnemy::CheckPointInRect(float fx, float fy, int nCameraX)
+bool CObjEnemy::CheckPointInRect(float fx, float fy, int nCameraX)
 {
 	if (fx >= m_fx - nCameraX && fx <= m_fx - nCameraX + m_nWidth &&
 		fy >= m_fy && fy <= m_fy + m_nHeight) 
 	{
 		// 剣先の座標が敵矩形内にある場合は敵が攻撃を受けたとみなす
-		m_bDamaged = true;
+		return true;
 	}
+
+	return false;
 }
 
 

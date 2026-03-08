@@ -1,6 +1,12 @@
 #pragma once
 #include "DxLib.h"
 
+#include <filesystem>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <cmath> // fabsf を使うために追加
+
 // キャラクターの方向
 enum {
 	DIRECTION_L,
@@ -22,7 +28,7 @@ public:
 public:
 	// パラメータセット
 	void SetParameter(float fx, float fy, float fvx, float fvy, const char* pchImg=nullptr);
-	void SetImages(const char* pchImgL, const char* pchImgR, const char* pchDmgL, const char* pchDmgR);
+	void SetImages(const char* pchImgL, const char* pchImgR, const char* pchDmgL = nullptr, const char* pchDmgR=nullptr);
 
  	virtual void Draw(int nCameraX);
 
@@ -31,14 +37,11 @@ public:
 	float GetVx();
 	float GetVy();
 	void AddX(float fx);
-	void AddY();
 	int GetDirection();
 	int GetWidth();
 	int GetHeight();
 	int GetImg();
 	int GetTimer();
-	bool IsHit();
-	bool IsAttack();
 	bool IsDamaged();
 	void AddTimer(int nTime);
 
@@ -47,10 +50,8 @@ public:
 	void SetVx(float vx);
 	void SetVy(float vy);
 	void SetImg(int nImg);
-	void SetHit(bool bHit);
 	void SetDirection(int nDirection);
-	bool SetAttack(bool bAttack);
-	bool SetDamaged(bool bDamaged);
+	void SetDamaged(bool bDamaged);
 	void SetTimer(int nTimer);
 
 	bool DamagedCheck();
@@ -79,8 +80,6 @@ protected:
 	int m_nHeight;    // 幅
 	
 	// ヒットチェック用
-	bool m_bHit;
-	bool m_bAttack;
 	bool m_bDamaged;
 	int m_nTimer;
 

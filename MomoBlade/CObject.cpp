@@ -3,10 +3,12 @@
 // コンストラクタ
 CObject::CObject() 
 	: m_fx(0), m_fy(0), m_fvx(0), m_fvy(0),
-	m_nWidth(0), m_nHeight(0),
-m_bHit(false), m_bAttack(false), m_bDamaged(false), m_nTimer(0)
+	m_nWidth(0), m_nHeight(0), m_bDamaged(false), m_nTimer(0)
 {
-
+	m_nImg_L = -1;
+	m_nImg_R = -1;
+	m_nDmgImg_L = -1;
+	m_nDmgImg_R = -1;
 }
 
 CObject::CObject(float fx, float fy, float fvx, float fvy)
@@ -24,6 +26,7 @@ void CObject::SetParameter(float fx, float fy, float fvx, float fvy, const char 
 
 	if (pchImg != nullptr) {
 		m_nCurrentImg = LoadGraph(pchImg);
+		GetGraphSize(m_nCurrentImg, &m_nWidth, &m_nHeight);
 	}
 
 }
@@ -45,7 +48,6 @@ void CObject::SetImages(const char* pchImgL, const char* pchImgR, const char* pc
 	}
 
 	if (m_nImg_L != -1) {
-		GetGraphSize(m_nImg_L, &m_nWidth, &m_nHeight);
 		m_nCurrentImg = m_nImg_L;
 	}
 }
@@ -60,7 +62,7 @@ void CObject::Draw(int nCameraX)
 bool CObject::DamagedCheck()
 {
 	if (!m_bDamaged) return false;
-
+	
 	m_nTimer++;
 	if (m_nTimer > 45) {
 		m_nTimer = 0;
@@ -125,16 +127,6 @@ int CObject::GetImg()
 	return m_nCurrentImg;
 }
 
-bool CObject::IsHit()
-{
-	return m_bHit;
-}
-
-bool CObject::IsAttack()
-{
-	return m_bAttack;
-}
-
 bool CObject::IsDamaged()
 {
 	return m_bDamaged;
@@ -151,17 +143,9 @@ void CObject::AddTimer(int nTime)
 }
 
 // セッター
-void CObject::SetHit(bool bHit)
+void CObject::SetDamaged(bool bDamaged)
 {
-	m_bHit = bHit;
-}
-bool CObject::SetAttack(bool bAttack)
-{
-	return m_bAttack;
-}
-bool CObject::SetDamaged(bool bDamaged)
-{
-	return m_bDamaged;
+	m_bDamaged = bDamaged;
 }
 void CObject::SetTimer(int nTimer)
 {
@@ -196,5 +180,12 @@ void CObject::SetImg(int nImg)
 void CObject::SetDirection(int nDirection)
 {
 	m_nDirection = nDirection;
+
+	if (m_nDirection == DIRECTION_L) {
+		m_nCurrentImg = m_nImg_L;
+	}
+	else {
+		m_nCurrentImg = m_nImg_R;
+	}
 }
 

@@ -8,7 +8,11 @@ public:
 
 public:
 	void InitEnmey(float fDetectW, const char* pchImg);
-	void Update();
+	void InitWeapon(const char* pchImg1, const char* pchImg2);
+
+	void Update(float fx, float fy) override;
+	void Attack(float fx, float fy) override;
+	void Arrow(float fx, float fy);
 	void Draw(int nCameraX) override;
 
 private:
@@ -16,4 +20,8 @@ private:
 	bool m_bDetect;    // 検知の有無
 	int m_nImgDetect;  // 「!」マーク画像
 
+	CObject m_ObjBow;
+	CObject m_ObjArrow;
+	double m_dLength;
+	double m_dAngle;
 };
