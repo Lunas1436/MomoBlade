@@ -22,7 +22,7 @@ void CObjEnemy::InitEnmey(float fRangeL, float fRangeR, float fDetectW, const ch
 	}
 }
 
-void CObjEnemy::Update(float fx, float fy)
+void CObjEnemy::Update(CObject* pTarget)
 {
 	if (m_bDamaged) {
 		if (m_nDirection == DIRECTION_L) {
@@ -42,20 +42,28 @@ void CObjEnemy::Update(float fx, float fy)
 	}
 
 	m_bDetect = false;
-	if (m_fy - 50 <= fy && fy <= m_fy + m_nHeight + 20) {
-		if (m_fx - m_fDetectW <= fx && fx <= m_fx) {
-			DrawGraph(m_fx - 60, m_fy - 60, m_nImgDetect, TRUE);
+	if (m_fy - 50 <= pTarget->GetY() && pTarget->GetY() <= m_fy + m_nHeight + 20) {
+		if (m_fx - m_fDetectW <= pTarget->GetX() && pTarget->GetX() <= m_fx) {
 			m_bDetect = true;
 		}
 	}
 }
 
-void CObjEnemy::Attack(float fx, float fy)
+void CObjEnemy::Attack(CObject* pTarget)
 {
 
 }
 
-bool CObjEnemy::CheckPointInRect(float fx, float fy, int nCameraX)
+void CObjEnemy::Draw(int nCameraX)
+{
+	CObject::Draw(nCameraX);
+
+	if (m_bDetect) {
+		DrawGraph(m_fx - nCameraX - 30, m_fy - 35, m_nImgDetect, TRUE);
+	}
+}
+
+bool CObjEnemy::IsPointInRect(float fx, float fy, int nCameraX)
 {
 	if (fx >= m_fx - nCameraX && fx <= m_fx - nCameraX + m_nWidth &&
 		fy >= m_fy && fy <= m_fy + m_nHeight) 

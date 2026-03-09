@@ -13,6 +13,7 @@ public:
 public:
 	void InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR);
 	void InitHP(float fx, float fy, const char *pchImg, vector<filesystem::path> &pathList);	
+	void UpdateHP();
 
 	void DrawSword(int nCameraX);
 	void DrawHP();

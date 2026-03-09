@@ -44,11 +44,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         DrawMomo(); // モモのメンバ関数にする
         // 剣描画
         ObjMomo.DrawSword(nCameraX);
-        // HP描画
-        ObjMomo.DrawHP();
 
         // 敵更新
         UpdateEnemy();
+
+        // HP
+        ObjMomo.UpdateHP();
+        ObjMomo.DrawHP();
 
         // 敵描画
         DrawEnemy();
@@ -137,18 +139,19 @@ void InitData()
 
     // 敵2
     CObjEnemy2* pEnemy2 = new CObjEnemy2();
-    pEnemy2->SetParameter(1100, 50, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
-    //pEnemy2->SetY(pEnemy2->GetY() + pEnemy2->GetHeight() / 2);
+    pEnemy2->SetParameter(900, 150, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
     pEnemy2->SetImages(
         "Image/Enemy/Enemy2_L.png",
         "Image/Enemy/Enemy2_R.png",
         "Image/Enemy/Enemy2_Damaged_L.png",
         "Image/Enemy/Enemy2_Damaged_R.png"
     );
+    pEnemy2->InitEnmey(0.0f, 0.0f, 400.0f, "Image/Enemy/DetectMark.png");
     pEnemy2->InitWeapon(
         "Image/Enemy/Bow.png",
         "Image/Enemy/Arrow.png"
     );
+    pEnemy2->SetArrowRange(STAGE_WIDTH, STAGE_HEIGHT);
     m_ObjEnemyList.push_back(pEnemy2);
 
     // サウンド
@@ -316,11 +319,9 @@ void UpdateEnemy()
     // 敵1→単純な往復
     // 敵2→モモを検知したら攻撃してくる→その場からは動かない
     // 敵3→モモを検知したら突進してくる
-    float fMomoX = ObjMomo.GetX();
-    float fMomoY = ObjMomo.GetY();
     for (int i = 0; i < m_ObjEnemyList.size(); i++) {
-        m_ObjEnemyList[i]->Update(fMomoX, fMomoY);
-        m_ObjEnemyList[i]->Attack(fMomoX, fMomoY);
+        m_ObjEnemyList[i]->Update(&ObjMomo);
+        m_ObjEnemyList[i]->Attack(&ObjMomo);
     }
 }
 
@@ -353,7 +354,7 @@ void CollisionCheck()
         ObjMomo.CalcSwordTipXY(&fTipX, &fTipY);
         for (int i = 0; i < m_ObjEnemyList.size(); i++) {
             if (!m_ObjEnemyList[i]->IsDamaged()) {
-                if (m_ObjEnemyList[i]->CheckPointInRect(fTipX, fTipY, nCameraX)) {
+                if (m_ObjEnemyList[i]->IsPointInRect(fTipX, fTipY, nCameraX)) {
                     m_ObjEnemyList[i]->SetDamaged(true);
                 }
             }
@@ -368,10 +369,10 @@ void CollisionCheck()
         for (int i = 0; i < m_ObjEnemyList.size(); i++) {
             if (ObjMomo.AABBOverlap(*m_ObjEnemyList[i])) {
                 ObjMomo.SetDamaged(true);
-                if (!ObjMomo.SubstractHP(1)) {
-                    // ゲームオーバー
-                    nGameState = GAME_OVER;
-                }
+                //if (!ObjMomo.SubstractHP(1)) {
+                //    // ゲームオーバー
+                //    nGameState = GAME_OVER;
+                //}
             }
         }
     }

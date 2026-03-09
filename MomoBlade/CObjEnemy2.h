@@ -1,5 +1,9 @@
 #pragma once
 #include "CObjEnemy.h"
+#include <iostream>
+#include <queue>
+
+using namespace std;
 
 class CObjEnemy2 : public CObjEnemy
 {
@@ -7,21 +11,32 @@ public:
 	CObjEnemy2();
 
 public:
-	void InitEnmey(float fDetectW, const char* pchImg);
 	void InitWeapon(const char* pchImg1, const char* pchImg2);
 
-	void Update(float fx, float fy) override;
-	void Attack(float fx, float fy) override;
-	void Arrow(float fx, float fy);
+	void Update(CObject* pTarget) override;
+	void Attack(CObject* pTarget) override;
 	void Draw(int nCameraX) override;
 
-private:
-	float m_fDetectW;  // 検知範囲。敵の位置から向いている方向にfDetectDistの範囲内にモモがいれば検知
-	bool m_bDetect;    // 検知の有無
-	int m_nImgDetect;  // 「!」マーク画像
+	void Loading(float fx, float fy);
+	
+	float CalcAngle(float fx, float fy, float ex, float ey);
+	void SetArrowRange(float fRangeX, float fRangeY);
 
+private:
 	CObject m_ObjBow;
 	CObject m_ObjArrow;
+	struct ARROW {
+		float fx;
+		float fy;
+		float fvx;
+		float fvy;
+		float fAngle;
+	};
+	vector<ARROW> m_Arrows;
 	double m_dLength;
 	double m_dAngle;
+
+	float m_fArrowRngX = 0;
+	float m_fArrowRngY = 0;
+
 };

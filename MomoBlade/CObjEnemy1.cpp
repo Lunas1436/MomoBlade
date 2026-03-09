@@ -7,9 +7,9 @@ CObjEnemy1::CObjEnemy1()
 
 }
 
-void CObjEnemy1::Update(float fx, float fy)
+void CObjEnemy1::Update(CObject* pTarget)
 {
-	CObjEnemy::Update(fx, fy);
+	CObjEnemy::Update(pTarget);
 
 	// 左右の往復移動
 	m_fx += m_fvx;
@@ -27,7 +27,7 @@ void CObjEnemy1::Update(float fx, float fy)
 	}
 }
 
-void CObjEnemy1::Attack(float fx, float fy)
+void CObjEnemy1::Attack(CObject* pTarget)
 {
 
 }

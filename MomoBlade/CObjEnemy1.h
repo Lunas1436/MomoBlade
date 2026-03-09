@@ -7,10 +7,7 @@ public:
 	CObjEnemy1();
 
 public:
-	void Update(float fx, float fy) override;
-	void Attack(float fx, float fy) override;
+	void Update(CObject* pTarget) override;
+	void Attack(CObject* pTarget) override;
 	void Draw();
-
-
-
 };

@@ -35,6 +35,13 @@ void CObjMomo::InitHP(float fx, float fy, const char *pchImg, vector<filesystem:
     }
 }
 
+void CObjMomo::UpdateHP()
+{
+    if (m_bDamaged && m_nTimer == 0) {
+        m_nHP--;
+    }
+}
+
 void CObjMomo::DrawSword(int nCameraX)
 {
     float fSwordX = m_fx - nCameraX + m_nWidth + 10;
