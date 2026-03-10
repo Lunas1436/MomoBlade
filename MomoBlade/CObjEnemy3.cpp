@@ -12,6 +12,13 @@ void CObjEnemy3::SetStartX(float fx)
 	m_fStartX = fx;
 }
 
+void CObjEnemy3::SetLoseMark(const char* pchImg)
+{
+	if (pchImg != nullptr) {
+		m_nImgLoseTarget = LoadGraph(pchImg);
+	}
+}
+
 void CObjEnemy3::Update(CObject* pTarget)
 {
 	CObjEnemy::Update(pTarget);
@@ -33,6 +40,7 @@ void CObjEnemy3::Update(CObject* pTarget)
 			if (m_nTryTimer >= 300) {
 				m_nTryTimer = 0;
 				m_bReturn = true;
+				m_bLoseTarget = false;
 			}
 		}
 		if (m_bReturn) {
@@ -107,9 +115,13 @@ void CObjEnemy3::ReturnToPlace()
 
 }
 
-void CObjEnemy3::Draw()
+void CObjEnemy3::Draw(int nCameraX)
 {
+	CObjEnemy::Draw(nCameraX);
 
+	if (m_bLoseTarget) {
+		DrawGraph(m_fx - nCameraX - 25, m_fy - 25, m_nImgLoseTarget, TRUE);
+	}
 }
 
 

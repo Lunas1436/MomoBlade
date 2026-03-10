@@ -165,7 +165,8 @@ void InitData()
         "Image/Enemy/Enemy3_Damaged_R.png"
     );
     pEnemy3->SetStartX(pEnemy3->GetX());
-    pEnemy3->InitEnmey(0.0f, 0.0f, 300, "Image/Enemy/DetectMark.png");
+    pEnemy3->SetLoseMark("Image/Enemy/LoseMark.png");
+    pEnemy3->InitEnmey(0.0f, 0.0f, 400, "Image/Enemy/DetectMark.png");
     m_ObjEnemyList.push_back(pEnemy3);
 
     // ƒTƒEƒ“ƒh

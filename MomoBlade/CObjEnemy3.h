@@ -7,18 +7,20 @@ public:
 	CObjEnemy3();
 
 public:
-
 	void SetStartX(float fx);
+	void SetLoseMark(const char* pchImg);
 
 	void Update(CObject* pTarget) override;
 	void Attack(CObject* pTarget) override;
-	void Draw();
+	void Draw(int nCameraX) override;
 
 private:
 	void SearchTarget();
 	void ReturnToPlace();
 
 private:
+	int m_nImgLoseTarget;
+
 	bool m_bAttacking = false;
 	bool m_bLoseTarget = false;
 	bool m_bReturn = false;
