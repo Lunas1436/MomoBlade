@@ -125,34 +125,48 @@ void InitData()
     ObjMomo.InitHP(20.0, 20.0, "Image/Momo/HP.png", pathList);
 
     // 敵1
-    CObjEnemy1* pEnemy1 = new CObjEnemy1();
-    pEnemy1->SetParameter(1000.0f, 0.0f, 3.0f, 0.0f, "Image/Enemy/Enemy1_L.png");
-    pEnemy1->SetY(nGroundY - pEnemy1->GetHeight());
-    pEnemy1->SetImages(
-        "Image/Enemy/Enemy1_L.png",
-        "Image/Enemy/Enemy1_R.png",
-        "Image/Enemy/Enemy1_Damaged_L.png",
-        "Image/Enemy/Enemy1_Damaged_R.png"
-    );
-    pEnemy1->InitEnmey(500.0f, 1000.0f, 300, nullptr);
-    m_ObjEnemyList.push_back(pEnemy1);
+    //CObjEnemy1* pEnemy1 = new CObjEnemy1();
+    //pEnemy1->SetParameter(1000.0f, 0.0f, 3.0f, 0.0f, "Image/Enemy/Enemy1_L.png");
+    //pEnemy1->SetY(nGroundY - pEnemy1->GetHeight());
+    //pEnemy1->SetImages(
+    //    "Image/Enemy/Enemy1_L.png",
+    //    "Image/Enemy/Enemy1_R.png",
+    //    "Image/Enemy/Enemy1_Damaged_L.png",
+    //    "Image/Enemy/Enemy1_Damaged_R.png"
+    //);
+    //pEnemy1->InitEnmey(500.0f, 1000.0f, 300, nullptr);
+    //m_ObjEnemyList.push_back(pEnemy1);
 
-    // 敵2
-    CObjEnemy2* pEnemy2 = new CObjEnemy2();
-    pEnemy2->SetParameter(900, 150, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
-    pEnemy2->SetImages(
-        "Image/Enemy/Enemy2_L.png",
-        "Image/Enemy/Enemy2_R.png",
-        "Image/Enemy/Enemy2_Damaged_L.png",
-        "Image/Enemy/Enemy2_Damaged_R.png"
+    //// 敵2
+    //CObjEnemy2* pEnemy2 = new CObjEnemy2();
+    //pEnemy2->SetParameter(900, 150, 0.0f, 0.0f, "Image/Enemy/Enemy2_L.png");
+    //pEnemy2->SetImages(
+    //    "Image/Enemy/Enemy2_L.png",
+    //    "Image/Enemy/Enemy2_R.png",
+    //    "Image/Enemy/Enemy2_Damaged_L.png",
+    //    "Image/Enemy/Enemy2_Damaged_R.png"
+    //);
+    //pEnemy2->InitEnmey(0.0f, 0.0f, 400.0f, "Image/Enemy/DetectMark.png");
+    //pEnemy2->InitWeapon(
+    //    "Image/Enemy/Bow.png",
+    //    "Image/Enemy/Arrow.png"
+    //);
+    //pEnemy2->SetArrowRange(STAGE_WIDTH, STAGE_HEIGHT);
+    //m_ObjEnemyList.push_back(pEnemy2);
+
+    // 敵3
+    CObjEnemy3* pEnemy3 = new CObjEnemy3();
+    pEnemy3->SetParameter(1000, 0.0f, 5.0f, 0.0f, "Image/Enemy/Enemy3_L.png");
+    pEnemy3->SetY(nGroundY - pEnemy3->GetHeight());
+    pEnemy3->SetImages(
+        "Image/Enemy/Enemy3_L.png",
+        "Image/Enemy/Enemy3_R.png",
+        "Image/Enemy/Enemy3_Damaged_L.png",
+        "Image/Enemy/Enemy3_Damaged_R.png"
     );
-    pEnemy2->InitEnmey(0.0f, 0.0f, 400.0f, "Image/Enemy/DetectMark.png");
-    pEnemy2->InitWeapon(
-        "Image/Enemy/Bow.png",
-        "Image/Enemy/Arrow.png"
-    );
-    pEnemy2->SetArrowRange(STAGE_WIDTH, STAGE_HEIGHT);
-    m_ObjEnemyList.push_back(pEnemy2);
+    pEnemy3->SetStartX(pEnemy3->GetX());
+    pEnemy3->InitEnmey(0.0f, 0.0f, 300, "Image/Enemy/DetectMark.png");
+    m_ObjEnemyList.push_back(pEnemy3);
 
     // サウンド
     // ステージBGM

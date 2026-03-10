@@ -36,6 +36,10 @@ private:
 	double m_dLength;
 	double m_dAngle;
 
+	int m_nFireTimer = 0;
+	int m_nFireInterval = 120;
+	float m_fArrowSpd = 6.0f;
+
 	float m_fArrowRngX = 0;
 	float m_fArrowRngY = 0;
 

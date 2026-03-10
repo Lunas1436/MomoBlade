@@ -9,7 +9,7 @@ public:
 	virtual void Update(CObject* pTarget);
 	virtual void Attack(CObject *pTarget);
 	virtual void Draw(int nCameraX);
-	void InitEnmey(float fRangeL, float fRangeR, float fDetectW, const char* pchImg);
+	virtual void InitEnmey(float fRangeL, float fRangeR, float fDetectW, const char* pchImg);
 
 public:
 	bool IsPointInRect(float fx, float fy, int nCameraX); // nCameraXを考慮しなくていいように修正する→GameMainのUpdateEnemyでEnemyのX座標をカメラ考慮版に更新するとか
@@ -23,8 +23,6 @@ protected:
 	int m_nImgDetect;  // 「!」マーク画像
 
 	//bool m_bIsAttacking; // モモと共通ならCObjectに定義する
-	int m_nFireTimer = 0;
-	int m_nFireInterval = 120;
-	float m_fArrowSpd = 6.0f;
+
 
 };

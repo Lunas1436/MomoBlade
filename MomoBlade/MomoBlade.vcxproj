@@ -136,6 +136,7 @@
     <ClCompile Include="CObjEnemy.cpp" />
     <ClCompile Include="CObjEnemy1.cpp" />
     <ClCompile Include="CObjEnemy2.cpp" />
+    <ClCompile Include="CObjEnemy3.cpp" />
     <ClCompile Include="CObjMomo.cpp" />
     <ClCompile Include="CObjSword.cpp" />
     <ClCompile Include="GameMain.cpp" />
@@ -145,6 +146,7 @@
     <ClInclude Include="CObjEnemy.h" />
     <ClInclude Include="CObjEnemy1.h" />
     <ClInclude Include="CObjEnemy2.h" />
+    <ClInclude Include="CObjEnemy3.h" />
     <ClInclude Include="CObjMomo.h" />
     <ClInclude Include="CObjSword.h" />
     <ClInclude Include="GameMain.h" />

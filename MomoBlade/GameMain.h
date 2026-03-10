@@ -6,7 +6,7 @@
 #include "CObjSword.h"
 #include "CObjEnemy1.h"
 #include "CObjEnemy2.h"
-//#include "CObjEnemy3.h"
+#include "CObjEnemy3.h"
 #include <vector>
 
 using namespace std;

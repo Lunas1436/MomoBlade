@@ -43,8 +43,15 @@ void CObjEnemy::Update(CObject* pTarget)
 
 	m_bDetect = false;
 	if (m_fy - 50 <= pTarget->GetY() && pTarget->GetY() <= m_fy + m_nHeight + 20) {
-		if (m_fx - m_fDetectW <= pTarget->GetX() && pTarget->GetX() <= m_fx) {
-			m_bDetect = true;
+		if (m_nDirection == DIRECTION_L) {
+			if (m_fx - m_fDetectW <= pTarget->GetX() && pTarget->GetX() <= m_fx) {
+				m_bDetect = true;
+			}
+		}
+		else {
+			if (m_fx <= pTarget->GetX() && pTarget->GetX() <= m_fx + m_fDetectW) {
+				m_bDetect = true;
+			}
 		}
 	}
 }
