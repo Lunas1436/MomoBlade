@@ -165,7 +165,10 @@ void InitData()
         "Image/Enemy/Enemy3_Damaged_R.png"
     );
     pEnemy3->SetStartX(pEnemy3->GetX());
-    pEnemy3->SetLoseMark("Image/Enemy/LoseMark.png");
+    pEnemy3->SetImagesEne3(
+        "Image/Enemy/Shield.png",
+        "Image/Enemy/LoseMark.png"
+    );
     pEnemy3->InitEnmey(0.0f, 0.0f, 400, "Image/Enemy/DetectMark.png");
     m_ObjEnemyList.push_back(pEnemy3);
 
@@ -279,7 +282,7 @@ void DrawMomo()
                         float fLandY = ObjBlockList[i].GetY();
                         if (fPrevBottom <= fLandY && fLandY <= fNextBottom) {
                             // 着地
-                            ObjMomo.SetY(fLandY - ObjMomo.GetHeight());
+                            fNextTop = fLandY - ObjMomo.GetHeight();
                             ObjMomo.SetOnLand(true);
                             ObjMomo.SetVy(0.0f);
                             m_nOnIndex = i;
@@ -299,15 +302,19 @@ void DrawMomo()
             }
             else {
                 // オブジェクトにモモの頭が直撃するか判定
-                if (m_nOnIndex >= 0 && ObjMomo.IsMomoInRangeObjectX(ObjBlockList[m_nOnIndex])) {
-                    float fBlockTop = ObjBlockList[m_nOnIndex].GetY() + ObjBlockList[m_nOnIndex].GetHeight();
-                    if (fBlockTop <= fPrevTop && fNextTop <= fBlockTop) {
-                        fNextTop = fBlockTop;
-                        //ObjMomo.SetY(fBlockTop);
-                        ObjMomo.SetDestY(ObjGround.GetY());
+                bool bHeadHit = false;
+                for (int i = 0; i < ObjBlockList.size(); i++) {
+                    if (ObjMomo.IsMomoInRangeObjectX(ObjBlockList[i])) {
+                        float fBlockBottom = ObjBlockList[i].GetY() + ObjBlockList[i].GetHeight();
+                        if (fNextTop <= fBlockBottom && fBlockBottom <= fPrevTop) { // i番目のブロックに頭直撃
+                            bHeadHit = true;
+                            fNextTop = fBlockBottom;
+                            ObjMomo.SetDestY(nGroundY);
+                            break;
+                        }
                     }
                 }
-                else {
+                if (!bHeadHit) {
                     float fDestY = ObjMomo.GetDestY();
                     if (fDestY <= fPrevTop && fNextTop <= fDestY) { // 最高点までジャンプした
                         fNextTop = fDestY;

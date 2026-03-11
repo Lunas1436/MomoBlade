@@ -8,7 +8,7 @@ public:
 
 public:
 	void SetStartX(float fx);
-	void SetLoseMark(const char* pchImg);
+	void SetImagesEne3(const char* pchImgShield, const char* pchImgLose);
 
 	void Update(CObject* pTarget) override;
 	void Attack(CObject* pTarget) override;
@@ -19,7 +19,8 @@ private:
 	void ReturnToPlace();
 
 private:
-	int m_nImgLoseTarget;
+	int m_nImgLoseMark;
+	int m_nImgShield;
 
 	bool m_bAttacking = false;
 	bool m_bLoseTarget = false;
@@ -27,5 +28,5 @@ private:
 	int m_nTryTimer = 0;
 	float m_fStartX;
 	int m_nIdleTimer = 0;
-	int m_nIdleInterval = 180;
+	int m_nIdleInterval = 240;
 };

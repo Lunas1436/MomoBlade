@@ -12,10 +12,16 @@ void CObjEnemy3::SetStartX(float fx)
 	m_fStartX = fx;
 }
 
-void CObjEnemy3::SetLoseMark(const char* pchImg)
+void CObjEnemy3::SetImagesEne3(const char* pchImgShield, const char *pchImgLose)
 {
-	if (pchImg != nullptr) {
-		m_nImgLoseTarget = LoadGraph(pchImg);
+	// 盾
+	if (pchImgShield != nullptr) {
+		m_nImgShield = LoadGraph(pchImgShield);
+	}
+
+	// 「?」マーク
+	if (pchImgLose != nullptr) {
+		m_nImgLoseMark = LoadGraph(pchImgLose);
 	}
 }
 
@@ -65,6 +71,7 @@ void CObjEnemy3::Attack(CObject* pTarget)
 			m_fvx -= 0.5;
 			if (m_fvx < 0) {
 				m_bLoseTarget = true;
+				m_bDetect = false;
 				m_bAttacking = false;
 			}
 		}
@@ -75,6 +82,7 @@ void CObjEnemy3::Attack(CObject* pTarget)
 			m_fvx -= 0.5;
 			if (m_fvx < 0) {
 				m_bLoseTarget = true;
+				m_bDetect = false;
 				m_bAttacking = false;
 			}
 		}
@@ -98,15 +106,18 @@ void CObjEnemy3::SearchTarget()
 	}
 }
 
+// 元の場所に戻る
 void CObjEnemy3::ReturnToPlace()
 {
 	if (m_fStartX >= m_fx) {
+		m_nDirection = DIRECTION_R;
 		m_fx += 3.0;
 		if (m_fx >= m_fStartX) {
 			m_bReturn = false;
 		}
 	}
 	else {
+		m_nDirection = DIRECTION_L;
 		m_fx -= 3.0;
 		if (m_fx <= m_fStartX) {
 			m_bReturn = false;
@@ -119,8 +130,10 @@ void CObjEnemy3::Draw(int nCameraX)
 {
 	CObjEnemy::Draw(nCameraX);
 
+
+
 	if (m_bLoseTarget) {
-		DrawGraph(m_fx - nCameraX - 25, m_fy - 25, m_nImgLoseTarget, TRUE);
+		DrawGraph(m_fx - nCameraX - 25, m_fy - 25, m_nImgLoseMark, TRUE);
 	}
 }
 
