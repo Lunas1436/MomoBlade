@@ -42,6 +42,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
         // モモ描画
         DrawMomo(); // モモのメンバ関数にする
+
         // 剣描画
         ObjMomo.DrawSword(nCameraX);
 
@@ -89,15 +90,16 @@ void InitData()
 
     // 地中
     ObjUnderGround.SetParameter(ObjGround.GetX(), 0.0f, 0.0f, 0.0f, "Image/Stage/UnderGround.png");
-    ObjUnderGround.SetY(ObjGround.GetY() + ObjUnderGround.GetHeight());
+    ObjUnderGround.SetY(nGroundY + ObjUnderGround.GetHeight());
 
     // ブロック
-    ObjBlock.SetParameter(500, ObjGround.GetY() - 150, 0, 0, "Image/Stage/Block.png");
+    ObjBlock.SetParameter(500, nGroundY - 150, 0, 0, "Image/Stage/Block.png");
     ObjBlockList.push_back(ObjBlock);
 
     // ゴールフラッグ
-    ObjGoalFlag.SetParameter(STAGE_WIDTH - 200, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png");
-    ObjGoalFlag.SetY(ObjGround.GetY() - ObjGoalFlag.GetHeight());
+    //ObjGoalFlag.SetParameter(STAGE_WIDTH - 200, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png");
+    ObjGoalFlag.SetParameter(500, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png");
+    ObjGoalFlag.SetY(nGroundY - ObjGoalFlag.GetHeight());
 
     // モモタロー
     ObjMomo.SetParameter(100, 0.0f, 5.0f, 0.0f, "Image/Momo/Momo_R.png");
@@ -155,22 +157,22 @@ void InitData()
     //m_ObjEnemyList.push_back(pEnemy2);
 
     // 敵3
-    CObjEnemy3* pEnemy3 = new CObjEnemy3();
-    pEnemy3->SetParameter(1000, 0.0f, 5.0f, 0.0f, "Image/Enemy/Enemy3_L.png");
-    pEnemy3->SetY(nGroundY - pEnemy3->GetHeight());
-    pEnemy3->SetImages(
-        "Image/Enemy/Enemy3_L.png",
-        "Image/Enemy/Enemy3_R.png",
-        "Image/Enemy/Enemy3_Damaged_L.png",
-        "Image/Enemy/Enemy3_Damaged_R.png"
-    );
-    pEnemy3->SetStartX(pEnemy3->GetX());
-    pEnemy3->SetImagesEne3(
-        "Image/Enemy/Shield.png",
-        "Image/Enemy/LoseMark.png"
-    );
-    pEnemy3->InitEnmey(0.0f, 0.0f, 400, "Image/Enemy/DetectMark.png");
-    m_ObjEnemyList.push_back(pEnemy3);
+    //CObjEnemy3* pEnemy3 = new CObjEnemy3();
+    //pEnemy3->SetParameter(1000, 0.0f, 5.0f, 0.0f, "Image/Enemy/Enemy3_L.png");
+    //pEnemy3->SetY(nGroundY - pEnemy3->GetHeight());
+    //pEnemy3->SetImages(
+    //    "Image/Enemy/Enemy3_L.png",
+    //    "Image/Enemy/Enemy3_R.png",
+    //    "Image/Enemy/Enemy3_Damaged_L.png",
+    //    "Image/Enemy/Enemy3_Damaged_R.png"
+    //);
+    //pEnemy3->SetStartX(pEnemy3->GetX());
+    //pEnemy3->SetImagesEne3(
+    //    "Image/Enemy/Shield.png",
+    //    "Image/Enemy/LoseMark.png"
+    //);
+    //pEnemy3->InitEnmey(0.0f, 0.0f, 400, "Image/Enemy/DetectMark.png");
+    //m_ObjEnemyList.push_back(pEnemy3);
 
     // サウンド
     // ステージBGM
@@ -362,7 +364,6 @@ void DrawEnemy()
 void CollisionCheck()
 {
     // 剣先と敵
-    // 全員のDamagedフラグを見る
     for (int i = 0; i < m_ObjEnemyList.size(); i++) {
         if (m_ObjEnemyList[i]->IsDamaged()) {
             if (m_ObjEnemyList[i]->DamagedCheck()) {
@@ -383,6 +384,8 @@ void CollisionCheck()
         }
     }
 
+
+
     // モモと敵のヒットチェック
     if (ObjMomo.DamagedCheck()) {
         ObjMomo.DrawDamaged(nCameraX);
@@ -391,13 +394,13 @@ void CollisionCheck()
         for (int i = 0; i < m_ObjEnemyList.size(); i++) {
             if (ObjMomo.AABBOverlap(*m_ObjEnemyList[i])) {
                 ObjMomo.SetDamaged(true);
-                //if (!ObjMomo.SubstractHP(1)) {
-                //    // ゲームオーバー
-                //    nGameState = GAME_OVER;
-                //}
             }
         }
     }
 }
 
+bool IsBreakingGoalFlag()
+{
 
+    return true;
+}

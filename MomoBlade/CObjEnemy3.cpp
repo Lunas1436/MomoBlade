@@ -130,7 +130,16 @@ void CObjEnemy3::Draw(int nCameraX)
 {
 	CObjEnemy::Draw(nCameraX);
 
+	int nShieldX = 0;
+	if (m_nDirection == DIRECTION_L) {
+		nShieldX = -60;
+	}
+	else {
+		nShieldX = 60;
+	}
 
+	// 盾描画
+	DrawGraph(m_fx - nCameraX + nShieldX, m_fy, m_nImgShield, TRUE);
 
 	if (m_bLoseTarget) {
 		DrawGraph(m_fx - nCameraX - 25, m_fy - 25, m_nImgLoseMark, TRUE);

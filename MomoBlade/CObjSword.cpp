@@ -31,7 +31,6 @@ void CObjSword::SwordAttack()
     // 斬撃モーション中
     PlaySoundMem(m_nSlashBGM, DX_PLAYTYPE_LOOP);
     m_dSwordAngle = m_nTimer * (3.14 / 180);
-
 }
 
 // 剣先の座標を計算

@@ -46,8 +46,13 @@ void CObjMomo::DrawSword(int nCameraX)
 {
     float fSwordX = m_fx - nCameraX + m_nWidth + 10;
     float fSwordY = m_fy - 20;
+    if (m_nDirection == DIRECTION_L) {
+        fSwordX = m_fx - nCameraX - 40;
+    }
+
     m_ObjSword.SetX(fSwordX);
     m_ObjSword.SetY(fSwordY);
+    m_ObjSword.SetDirection(m_nDirection);
     m_ObjSword.DrawSword();
 }
 
@@ -110,13 +115,11 @@ void CObjMomo::MoveMomo(int nDirection)
     }
     
     SetDirection(nDirection);
-    m_ObjSword.SetDirection(nDirection);
 }
 
 void CObjMomo::CalcSwordTipXY(float* pfx, float* pfy)
 {
     m_ObjSword.CalcSwordTipXY(pfx, pfy);
-
 }
 
 // モモがオブジェクトの上に乗っているか判定
