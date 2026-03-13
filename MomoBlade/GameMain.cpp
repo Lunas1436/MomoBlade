@@ -4,6 +4,9 @@
 #include <string>
 #include <cmath>
 
+// 確認用
+int nCnt = 0;
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     SetWindowText("MOMO BLADE"); // ウィンドウのタイトル
@@ -387,11 +390,12 @@ void CollisionCheck()
         int nGoalX = ObjGoalFlag.GetX() / 2;
         int nGoalY = ObjGoalFlag.GetY();
         if (nGoalY <= fTipY && nGoalX <= fTipX) {
-            ObjGoalFlag.SetImg(nBrokenGoal);
-            int aaa = 100;
+            nCnt++;
+            if (nCnt >= 300) {
+                ObjGoalFlag.SetImg(nBrokenGoal);
+            }
         }
     }
-
 
     // モモと敵のヒットチェック
     if (ObjMomo.DamagedCheck()) {
