@@ -4,6 +4,9 @@
 #include <string>
 #include <cmath>
 
+// 確認用
+int nGoalCnt = 0;
+int nBrokenGoal = LoadGraph("Image/Stage/GoalFlag_Broken.png");
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -16,6 +19,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // 初期化
     InitData();
+
+    nBrokenGoal = LoadGraph("Image/Stage/GoalFlag_Broken.png");
 
     // ステージのBGMをループ再生で流す
     PlaySoundMem(nStageBGM, DX_PLAYTYPE_LOOP);
@@ -41,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         }
 
         // モモ描画
-        DrawMomo(); // モモのメンバ関数にする
+        DrawMomo();
 
         // 剣描画
         ObjMomo.DrawSword(nCameraX);
@@ -382,8 +387,15 @@ void CollisionCheck()
                 }
             }
         }
-    }
 
+        // 確認用
+        int nGoalX = ObjGoalFlag.GetX() / 2;
+        int nGoalY = ObjGoalFlag.GetY();
+        if (nGoalY <= fTipY && nGoalX <= fTipX) {
+            ObjGoalFlag.SetImg(nBrokenGoal);
+            int aaa = 100;
+        }
+    }
 
 
     // モモと敵のヒットチェック

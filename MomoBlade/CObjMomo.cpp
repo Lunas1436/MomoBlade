@@ -79,15 +79,6 @@ void CObjMomo::DrawHP()
     }
 }
 
-bool CObjMomo::SubstractHP(int nDmg)
-{
-    m_nHP -= nDmg;
-    if (m_nHP <= 0) {
-        return false;
-    }
-    return true;
-}
-
 // Y方向の速度管理
 void CObjMomo::CalcMomoVy()
 {
