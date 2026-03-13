@@ -1,5 +1,4 @@
 #pragma once
-
 #include "CObject.h"
 #include "CObjSword.h"
 

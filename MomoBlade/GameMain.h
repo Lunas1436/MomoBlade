@@ -1,5 +1,4 @@
 #pragma once
-
 #include "DxLib.h"
 #include "CObject.h"
 #include "CObjMomo.h"

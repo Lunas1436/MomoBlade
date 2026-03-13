@@ -1,6 +1,7 @@
 #pragma once
 #include "CObject.h"
 
+
 class CObjEnemy : public CObject
 {
 public:

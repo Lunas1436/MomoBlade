@@ -1,5 +1,6 @@
 #include "CObject.h"
 
+
 // コンストラクタ
 CObject::CObject() 
 	: m_fx(0), m_fy(0), m_fvx(0), m_fvy(0),

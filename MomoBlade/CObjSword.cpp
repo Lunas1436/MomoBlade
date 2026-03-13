@@ -1,6 +1,7 @@
 #include "CObjSword.h"
 #include <math.h>
 
+
 CObjSword::CObjSword()
 {
 	m_dSwordLength = 0.0;

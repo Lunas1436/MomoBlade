@@ -1,6 +1,7 @@
 
 #include "CObjEnemy3.h"
 
+
 // コンストラクタ
 CObjEnemy3::CObjEnemy3()
 {

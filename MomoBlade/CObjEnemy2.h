@@ -3,6 +3,7 @@
 #include <iostream>
 #include <queue>
 
+
 using namespace std;
 
 class CObjEnemy2 : public CObjEnemy

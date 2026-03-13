@@ -1,5 +1,6 @@
 #include "CObjEnemy.h"
 
+
 CObjEnemy::CObjEnemy()
 {
 	m_nDirection = DIRECTION_L;

@@ -2,6 +2,7 @@
 #include "CObject.h"
 #include <DxLib.h>
 
+
 class CObjSword : public CObject
 {
 public:

@@ -1,6 +1,7 @@
 #include "CObjMomo.h"
 #include "CObjSword.h"
 
+
 CObjMomo::CObjMomo()
 {
     m_bOnLand = false;

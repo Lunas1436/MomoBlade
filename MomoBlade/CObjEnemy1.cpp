@@ -1,5 +1,5 @@
-
 #include "CObjEnemy1.h"
+
 
 // コンストラクタ
 CObjEnemy1::CObjEnemy1()

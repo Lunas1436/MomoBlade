@@ -1,8 +1,7 @@
 #include "GameMain.h"
-
-
 #include <string>
 #include <cmath>
+
 
 // Šm”F—p
 int nCnt = 0;
