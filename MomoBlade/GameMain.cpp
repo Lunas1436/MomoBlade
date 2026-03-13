@@ -4,10 +4,6 @@
 #include <string>
 #include <cmath>
 
-// 確認用
-int nGoalCnt = 0;
-int nBrokenGoal = LoadGraph("Image/Stage/GoalFlag_Broken.png");
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     SetWindowText("MOMO BLADE"); // ウィンドウのタイトル
@@ -19,8 +15,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
     // 初期化
     InitData();
-
-    nBrokenGoal = LoadGraph("Image/Stage/GoalFlag_Broken.png");
 
     // ステージのBGMをループ再生で流す
     PlaySoundMem(nStageBGM, DX_PLAYTYPE_LOOP);
@@ -103,8 +97,9 @@ void InitData()
 
     // ゴールフラッグ
     //ObjGoalFlag.SetParameter(STAGE_WIDTH - 200, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png");
-    ObjGoalFlag.SetParameter(500, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png");
+    ObjGoalFlag.SetParameter(500, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png"); // 挙動確認用の座標
     ObjGoalFlag.SetY(nGroundY - ObjGoalFlag.GetHeight());
+    nBrokenGoal = LoadGraph("Image/Stage/GoalFlag_Broken.png");
 
     // モモタロー
     ObjMomo.SetParameter(100, 0.0f, 5.0f, 0.0f, "Image/Momo/Momo_R.png");

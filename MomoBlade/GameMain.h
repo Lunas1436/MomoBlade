@@ -35,7 +35,8 @@ CObject ObjBlock;       // ブロック
 vector<CObject> ObjBlockList;    // ブロックリスト
 CObject ObjGoalFlag;    // ゴールフラッグ
 
-int nGroundY;
+int nGroundY;    // 地面のY座標
+int nBrokenGoal; // 破壊時のゴールフラッグ
 
 // BGM
 int nStageBGM; // ステージBGM
