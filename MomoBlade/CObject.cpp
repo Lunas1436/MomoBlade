@@ -1,6 +1,5 @@
 #include "CObject.h"
 
-
 // コンストラクタ
 CObject::CObject() 
 	: m_fx(0), m_fy(0), m_fvx(0), m_fvy(0),
@@ -13,6 +12,9 @@ CObject::CObject()
 }
 
 CObject::CObject(float fx, float fy, float fvx, float fvy)
+	: m_fx(fx), m_fy(fy), m_fvx(fvx), m_fvy(fvy),
+	m_nWidth(0), m_nHeight(0), m_bDamaged(false), m_nTimer(0),
+	m_nImg_L(-1), m_nImg_R(-1), m_nDmgImg_L(-1), m_nDmgImg_R(-1)
 {
 
 }
@@ -29,25 +31,16 @@ void CObject::SetParameter(float fx, float fy, float fvx, float fvy, const char 
 		m_nCurrentImg = LoadGraph(pchImg);
 		GetGraphSize(m_nCurrentImg, &m_nWidth, &m_nHeight);
 	}
-
 }
 
 // 画像セット
 void CObject::SetImages(const char* pchImgL, const char* pchImgR, const char* pchDmgL, const char* pchDmgR)
 {
-	if (pchImgL) {
-		m_nImg_L = LoadGraph(pchImgL);
-	}
-	if (pchImgL) {
-		m_nImg_R = LoadGraph(pchImgR);
-	}
-	if (pchImgL) {
-		m_nDmgImg_L = LoadGraph(pchDmgL);
-	}
-	if (pchImgL) {
-		m_nDmgImg_R = LoadGraph(pchDmgR);
-	}
-
+	if (pchImgL) { m_nImg_L = LoadGraph(pchImgL); }
+	if (pchImgR) { m_nImg_R = LoadGraph(pchImgR); }
+	if (pchDmgL) { m_nDmgImg_L = LoadGraph(pchDmgL); }
+	if (pchDmgR) { m_nDmgImg_R = LoadGraph(pchDmgR); }
+	
 	if (m_nImg_L != -1) {
 		m_nCurrentImg = m_nImg_L;
 	}

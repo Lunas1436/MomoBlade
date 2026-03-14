@@ -16,7 +16,6 @@ public:
 
 	void DrawSword(int nCameraX);
 	void DrawHP();
-	bool SubstractHP(int nDmg);
 
 	void CalcMomoVy();
 	void MoveMomo(int nDirection);

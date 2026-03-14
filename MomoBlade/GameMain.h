@@ -43,7 +43,7 @@ int nStageBGM; // ステージBGM
 // モモタロー
 CObjMomo ObjMomo;
 int nCameraX = 0; // モモを中心とするカメラのX座標
-int m_nOnIndex;
+int m_nOnIndex = -1;
 
 // 剣
 CObjSword ObjSword;

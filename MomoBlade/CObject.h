@@ -75,8 +75,8 @@ protected:
 	int m_nDmgImg_R;
 
 	int m_nDirection; // 方向
-	int m_nWidth;     // 高さ
-	int m_nHeight;    // 幅
+	int m_nWidth;     // 幅
+	int m_nHeight;    // 高さ
 	
 	// ヒットチェック用
 	bool m_bDamaged;

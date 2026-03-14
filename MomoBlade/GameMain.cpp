@@ -386,7 +386,7 @@ void CollisionCheck()
         }
 
         // Šm”F—p
-        int nGoalX = ObjGoalFlag.GetX() / 2;
+        int nGoalX = ObjGoalFlag.GetX();
         int nGoalY = ObjGoalFlag.GetY();
         if (nGoalY <= fTipY && nGoalX <= fTipX) {
             nCnt++;
@@ -409,8 +409,3 @@ void CollisionCheck()
     }
 }
 
-bool IsBreakingGoalFlag()
-{
-
-    return true;
-}

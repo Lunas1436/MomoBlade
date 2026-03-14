@@ -3,9 +3,13 @@
 
 
 CObjMomo::CObjMomo()
+    : m_bOnLand(false), m_bOnGround(false),
+    m_nHP(HP_MAX * 4),  
+    m_bAttacking(false),
+    m_nSwordTimer(0),   
+    m_dSwordLength(0.0) 
 {
-    m_bOnLand = false;
-    m_bOnGround = false;
+
 }
 
 // 剣初期化

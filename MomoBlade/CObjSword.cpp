@@ -6,6 +6,7 @@ CObjSword::CObjSword()
 {
 	m_dSwordLength = 0.0;
 	m_dSwordAngle = 0.0;
+    m_nSlashBGM = LoadSoundMem("Sound/Momo/SlashBGM.wav");
 }
 
 // 剣描画
@@ -30,7 +31,9 @@ void CObjSword::SwordAttack()
     }
 
     // 斬撃モーション中
-    PlaySoundMem(m_nSlashBGM, DX_PLAYTYPE_LOOP);
+    if (!CheckSoundMem(m_nSlashBGM)) { // 既に再生中か確認
+        PlaySoundMem(m_nSlashBGM, DX_PLAYTYPE_LOOP);
+    }
     m_dSwordAngle = m_nTimer * (3.14 / 180);
 }
 

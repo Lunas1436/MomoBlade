@@ -13,7 +13,7 @@ CObjEnemy::CObjEnemy()
 }
 
 // 敵初期化
-void CObjEnemy::InitEnmey(float fRangeL, float fRangeR, float fDetectW, const char* pchImg)
+void CObjEnemy::InitEnemy(float fRangeL, float fRangeR, float fDetectW, const char* pchImg)
 {
 	m_fRangeL = fRangeL;
 	m_fRangeR = fRangeR;
