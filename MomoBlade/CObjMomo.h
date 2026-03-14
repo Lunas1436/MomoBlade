@@ -10,7 +10,7 @@ public:
 	CObjMomo();
 
 public:
-	void InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR);
+	void InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR, const char* pchSound);
 	void InitHP(float fx, float fy, const char *pchImg, vector<filesystem::path> &pathList);	
 	void UpdateHP();
 
@@ -24,8 +24,11 @@ public:
 	bool IsMomoInRangeObjectX(CObject Obj); // モモがオブジェクトの上に乗っているか判定
 	bool AABBOverlap(CObject ObjEnemy);
 	
-	void SetDestY(float fDestY);
 	float GetDestY();
+	bool GetFinishSlow();
+
+	void SetDestY(float fDestY);
+	void SetFinishSlow(bool bSlow);
 	void SetOnLand(bool bOnLand);
 	void SetOnGround(bool bOnGround);
 	void SetIsAttacking(bool bAttacking);

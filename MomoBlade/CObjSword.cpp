@@ -1,12 +1,13 @@
 #include "CObjSword.h"
 #include <math.h>
 
-
 CObjSword::CObjSword()
 {
 	m_dSwordLength = 0.0;
 	m_dSwordAngle = 0.0;
-    m_nSlashBGM = LoadSoundMem("Sound/Momo/SlashBGM.wav");
+    m_bAttack = false;
+    m_bFinishSlow = false;
+    m_nSlashBGM = -1;
 }
 
 // 剣描画
@@ -21,7 +22,7 @@ void CObjSword::DrawSword()
 // 斬撃モーション
 void CObjSword::SwordAttack()
 {
-    m_nTimer += 10;
+    m_nTimer += m_bFinishSlow ? 1 : 10;
     if (m_nTimer > 90) { // 斬撃モーション終了
         m_nTimer = 0;
         m_bAttack = false;
@@ -31,9 +32,8 @@ void CObjSword::SwordAttack()
     }
 
     // 斬撃モーション中
-    if (!CheckSoundMem(m_nSlashBGM)) { // 既に再生中か確認
-        PlaySoundMem(m_nSlashBGM, DX_PLAYTYPE_LOOP);
-    }
+    // 再生中に呼び出した場合は最初から再生する
+    PlaySoundMem(m_nSlashBGM, DX_PLAYTYPE_LOOP);
     m_dSwordAngle = m_nTimer * (3.14 / 180);
 }
 
@@ -52,6 +52,11 @@ bool CObjSword::IsAttack()
     return m_bAttack;
 }
 
+bool CObjSword::GetFinishSlow()
+{
+    return m_bFinishSlow;
+}
+
 void CObjSword::SetSwordLength(double dLength)
 {
     m_dSwordLength = dLength;
@@ -67,4 +72,13 @@ void CObjSword::SetAttack(bool bAttack)
     m_bAttack = bAttack;
 }
 
+void CObjSword::SetFinishSlow(bool bSlow)
+{
+    m_bFinishSlow = bSlow;
+}
+
+void CObjSword::SetSound(const char* pchSound)
+{
+    m_nSlashBGM = LoadSoundMem(pchSound);
+}
 

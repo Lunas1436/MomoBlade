@@ -13,10 +13,11 @@ CObjMomo::CObjMomo()
 }
 
 // 剣初期化
-void CObjMomo::InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR)
+void CObjMomo::InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR, const char *pchSound)
 {
     m_ObjSword.SetParameter(0.0f, 0.0f, 0.0f, 0.0f, pchImgR);
     m_ObjSword.SetImages(pchImgL, pchImgR);
+    m_ObjSword.SetSound(pchSound);
     m_ObjSword.SetDirection(DIRECTION_R);
     m_ObjSword.SetSwordLength(m_ObjSword.GetWidth() * 1.41);
     m_ObjSword.SetSwordAngle(0.0f);
@@ -151,9 +152,19 @@ void CObjMomo::SetDestY(float fDestY)
     m_fDestY = fDestY;
 }
 
+void CObjMomo::SetFinishSlow(bool bSlow)
+{
+    m_ObjSword.SetFinishSlow(bSlow);
+}
+
 float CObjMomo::GetDestY()
 {
     return m_fDestY;
+}
+
+bool CObjMomo::GetFinishSlow()
+{
+    return m_ObjSword.GetFinishSlow();
 }
 
 void CObjMomo::SetOnLand(bool bOnLand)
@@ -185,7 +196,6 @@ bool CObjMomo::IsAttacking()
 {
     return m_ObjSword.IsAttack();
 }
-
 
 
 

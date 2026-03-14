@@ -5,16 +5,18 @@ CObject::CObject()
 	: m_fx(0), m_fy(0), m_fvx(0), m_fvy(0),
 	m_nWidth(0), m_nHeight(0), m_bDamaged(false), m_nTimer(0)
 {
+	m_nDirection = DIRECTION_L;
 	m_nImg_L = -1;
 	m_nImg_R = -1;
 	m_nDmgImg_L = -1;
 	m_nDmgImg_R = -1;
+	m_nDirection = -1;
 }
 
 CObject::CObject(float fx, float fy, float fvx, float fvy)
 	: m_fx(fx), m_fy(fy), m_fvx(fvx), m_fvy(fvy),
-	m_nWidth(0), m_nHeight(0), m_bDamaged(false), m_nTimer(0),
-	m_nImg_L(-1), m_nImg_R(-1), m_nDmgImg_L(-1), m_nDmgImg_R(-1)
+	m_nWidth(0), m_nHeight(0), m_bDamaged(false), m_nTimer(0), m_nDirection(DIRECTION_L),
+	m_nImg_L(-1), m_nImg_R(-1), m_nDmgImg_L(-1), m_nDmgImg_R(-1), m_nCurrentImg(-1)
 {
 
 }

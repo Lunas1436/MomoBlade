@@ -117,7 +117,11 @@ void InitData()
     ObjMomo.SetDirection(DIRECTION_R);
     
     // 剣
-    ObjMomo.InitSword(0.0f, 0.0f, 0.0f, 0.0f, "Image/Momo/Sword_L.png", "Image/Momo/Sword_R.png");
+    ObjMomo.InitSword(0.0f, 0.0f, 0.0f, 0.0f, 
+        "Image/Momo/Sword_L.png", 
+        "Image/Momo/Sword_R.png", 
+        "Sound/Momo/SlashBGM.wav"
+    );
 
     // HP
     vector<filesystem::path> pathList;
@@ -179,6 +183,7 @@ void InitData()
     // サウンド
     // ステージBGM
     nStageBGM = LoadSoundMem("Sound/Stage/StageBGM.wav");
+
 }
 
 // ステージ描画
@@ -389,11 +394,19 @@ void CollisionCheck()
         int nGoalX = ObjGoalFlag.GetX();
         int nGoalY = ObjGoalFlag.GetY();
         if (nGoalY <= fTipY && nGoalX <= fTipX) {
-            nCnt++;
-            if (nCnt >= 300) {
-                ObjGoalFlag.SetImg(nBrokenGoal);
+            if (!ObjGoalFlag.IsDamaged()) {
+                ObjGoalFlag.SetDamaged(true);
+                nCnt++;
+                if (nCnt >= 10) {
+                    ObjMomo.SetFinishSlow(true);
+                    ObjGoalFlag.SetImg(nBrokenGoal);
+                }
             }
         }
+    }
+    else {
+        // 確認用
+        ObjGoalFlag.SetDamaged(false);
     }
 
     // モモと敵のヒットチェック
