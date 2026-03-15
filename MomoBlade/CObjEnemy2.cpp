@@ -1,5 +1,6 @@
 #include "CObjEnemy2.h"
 
+
 CObjEnemy2::CObjEnemy2()
 {
 }

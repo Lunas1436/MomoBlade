@@ -1,17 +1,23 @@
 #include "CObjMomo.h"
 #include "CObjSword.h"
 
+
 CObjMomo::CObjMomo()
+    : m_bOnLand(false), m_bOnGround(false),
+    m_nHP(HP_MAX * 4),  
+    m_bAttacking(false),
+    m_nSwordTimer(0),   
+    m_dSwordLength(0.0) 
 {
-    m_bOnLand = false;
-    m_bOnGround = false;
+
 }
 
 // 剣初期化
-void CObjMomo::InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR)
+void CObjMomo::InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR, const char *pchSound)
 {
     m_ObjSword.SetParameter(0.0f, 0.0f, 0.0f, 0.0f, pchImgR);
     m_ObjSword.SetImages(pchImgL, pchImgR);
+    m_ObjSword.SetSound(pchSound);
     m_ObjSword.SetDirection(DIRECTION_R);
     m_ObjSword.SetSwordLength(m_ObjSword.GetWidth() * 1.41);
     m_ObjSword.SetSwordAngle(0.0f);
@@ -35,11 +41,16 @@ void CObjMomo::InitHP(float fx, float fy, const char *pchImg, vector<filesystem:
     }
 }
 
-void CObjMomo::UpdateHP()
+bool CObjMomo::UpdateHP()
 {
     if (m_bDamaged && m_nTimer == 0) {
         m_nHP--;
+        if (m_nHP <= 0) {
+            return false;
+        }
     }
+
+    return true;
 }
 
 void CObjMomo::DrawSword(int nCameraX)
@@ -116,7 +127,12 @@ void CObjMomo::CalcSwordTipXY(float* pfx, float* pfy)
 // モモがオブジェクトの上に乗っているか判定
 bool CObjMomo::IsMomoInRangeObjectX(CObject Obj)
 {
-    if (Obj.GetX() <= m_fx + m_nWidth && m_fx <= Obj.GetX() + Obj.GetWidth()) {
+    float fLeft = Obj.GetX();
+    float fRight = fLeft + Obj.GetWidth();
+
+    float fMomoX = m_fx + m_nWidth / 2;
+
+    if (fLeft <= fMomoX && fMomoX <= fRight) {
         return true;
     }
 
@@ -146,9 +162,19 @@ void CObjMomo::SetDestY(float fDestY)
     m_fDestY = fDestY;
 }
 
+void CObjMomo::SetFinishSlow(bool bSlow)
+{
+    m_ObjSword.SetFinishSlow(bSlow);
+}
+
 float CObjMomo::GetDestY()
 {
     return m_fDestY;
+}
+
+bool CObjMomo::GetFinishSlow()
+{
+    return m_ObjSword.GetFinishSlow();
 }
 
 void CObjMomo::SetOnLand(bool bOnLand)
@@ -166,6 +192,11 @@ void CObjMomo::SetIsAttacking(bool bAttacking)
     m_ObjSword.SetAttack(bAttacking);
 }
 
+void CObjMomo::StopSound()
+{
+    m_ObjSword.StopSound();
+}
+
 bool CObjMomo::IsOnLand()
 {
     return m_bOnLand;
@@ -180,7 +211,6 @@ bool CObjMomo::IsAttacking()
 {
     return m_ObjSword.IsAttack();
 }
-
 
 
 

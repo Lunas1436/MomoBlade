@@ -1,6 +1,7 @@
 #pragma once
 #include "CObjEnemy.h"
 
+
 class CObjEnemy3 : public CObjEnemy
 {
 public:
