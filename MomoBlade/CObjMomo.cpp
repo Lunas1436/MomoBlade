@@ -41,11 +41,16 @@ void CObjMomo::InitHP(float fx, float fy, const char *pchImg, vector<filesystem:
     }
 }
 
-void CObjMomo::UpdateHP()
+bool CObjMomo::UpdateHP()
 {
     if (m_bDamaged && m_nTimer == 0) {
         m_nHP--;
+        if (m_nHP <= 0) {
+            return false;
+        }
     }
+
+    return true;
 }
 
 void CObjMomo::DrawSword(int nCameraX)
@@ -180,6 +185,11 @@ void CObjMomo::SetOnGround(bool bOnGround)
 void CObjMomo::SetIsAttacking(bool bAttacking)
 {
     m_ObjSword.SetAttack(bAttacking);
+}
+
+void CObjMomo::StopSound()
+{
+    m_ObjSword.StopSound();
 }
 
 bool CObjMomo::IsOnLand()

@@ -18,6 +18,7 @@ public:
 	void SetAttack(bool bAttack);
 	void SetFinishSlow(bool bSlow);
 	void SetSound(const char* pchSound);
+	void StopSound();
 
 	void DrawSword();
 	void SwordAttack();

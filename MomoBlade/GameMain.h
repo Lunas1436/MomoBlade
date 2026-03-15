@@ -11,22 +11,6 @@
 using namespace std;
 
 // ステージ
-const int STAGE_WIDTH = 3000;
-const int STAGE_HEIGHT = 600;
-
-// スクリーン
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 600;
-
-// ゲームステート
-enum {
-	GAME_START, // ゲーム開始画面
-	GAME_PLAY,  // ゲームプレイ画面
-	GAME_OVER,   // ゲームオーバー画面
-};
-int nGameState = GAME_START;
-
-// ステージ
 CObject ObjSky;         // 空    
 CObject ObjGround;      // 地面
 CObject ObjUnderGround; // 地中
@@ -51,7 +35,14 @@ CObjSword ObjSword;
 // 敵
 vector<CObjEnemy*> m_ObjEnemyList;
 
-void InitData();
+void GameStart();
+void GamePlay();
+void GameClear();
+void GameOver();
+
+void InitGameString();
+void InitGamePlay();
+
 void DrawStage();
 void PlayerInput();
 

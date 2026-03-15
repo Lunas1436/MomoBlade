@@ -73,11 +73,11 @@ void CObjEnemy::Draw(int nCameraX)
 
 bool CObjEnemy::IsPointInRect(float fx, float fy, int nCameraX)
 {
-	if (fx >= m_fx - nCameraX && fx <= m_fx - nCameraX + m_nWidth &&
-		fy >= m_fy && fy <= m_fy + m_nHeight) 
-	{
-		// 剣先の座標が敵矩形内にある場合は敵が攻撃を受けたとみなす
-		return true;
+	if ((int)fx >= m_fx - nCameraX && (int)fx <= m_fx - nCameraX + m_nWidth) {
+		int aaa = 100;
+		if ((int)fy >= m_fy && (int)fy <= m_fy + m_nHeight) {
+			return true;
+		}
 	}
 
 	return false;

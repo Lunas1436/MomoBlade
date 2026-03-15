@@ -12,7 +12,7 @@ public:
 public:
 	void InitSword(float fx, float fy, float fvx, float fvy, const char* pchImgL, const char* pchImgR, const char* pchSound);
 	void InitHP(float fx, float fy, const char *pchImg, vector<filesystem::path> &pathList);	
-	void UpdateHP();
+	bool UpdateHP();
 
 	void DrawSword(int nCameraX);
 	void DrawHP();
@@ -32,7 +32,8 @@ public:
 	void SetOnLand(bool bOnLand);
 	void SetOnGround(bool bOnGround);
 	void SetIsAttacking(bool bAttacking);
-	
+	void StopSound();
+
 	bool IsOnLand();
 	bool IsOnGround();
 	bool IsAttacking();

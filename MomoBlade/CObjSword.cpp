@@ -27,7 +27,7 @@ void CObjSword::SwordAttack()
         m_nTimer = 0;
         m_bAttack = false;
         m_dSwordAngle = 0;
-        StopSoundMem(m_nSlashBGM, DX_PLAYTYPE_LOOP);
+        StopSound();
         return;
     }
 
@@ -80,5 +80,10 @@ void CObjSword::SetFinishSlow(bool bSlow)
 void CObjSword::SetSound(const char* pchSound)
 {
     m_nSlashBGM = LoadSoundMem(pchSound);
+}
+
+void CObjSword::StopSound()
+{
+    StopSoundMem(m_nSlashBGM, DX_PLAYTYPE_LOOP);
 }
 

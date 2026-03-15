@@ -76,7 +76,6 @@ void CObject::DrawDamaged(int nCameraX)
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0); // 通常の描画に戻す
 }
 
-
 // ゲッター
 float CObject::GetX()
 {
@@ -177,11 +176,21 @@ void CObject::SetDirection(int nDirection)
 {
 	m_nDirection = nDirection;
 
-	if (m_nDirection == DIRECTION_L) {
-		m_nCurrentImg = m_nImg_L;
+	if (m_bDamaged) {
+		if (m_nDirection == DIRECTION_L) {
+			m_nCurrentImg = m_nDmgImg_L;
+		}
+		else {
+			m_nCurrentImg = m_nDmgImg_R;
+		}
 	}
 	else {
-		m_nCurrentImg = m_nImg_R;
+		if (m_nDirection == DIRECTION_L) {
+			m_nCurrentImg = m_nImg_L;
+		}
+		else {
+			m_nCurrentImg = m_nImg_R;
+		}
 	}
 }
 
