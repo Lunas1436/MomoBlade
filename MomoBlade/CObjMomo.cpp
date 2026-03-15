@@ -127,7 +127,12 @@ void CObjMomo::CalcSwordTipXY(float* pfx, float* pfy)
 // モモがオブジェクトの上に乗っているか判定
 bool CObjMomo::IsMomoInRangeObjectX(CObject Obj)
 {
-    if (Obj.GetX() <= m_fx + m_nWidth && m_fx <= Obj.GetX() + Obj.GetWidth()) {
+    float fLeft = Obj.GetX();
+    float fRight = fLeft + Obj.GetWidth();
+
+    float fMomoX = m_fx + m_nWidth / 2;
+
+    if (fLeft <= fMomoX && fMomoX <= fRight) {
         return true;
     }
 

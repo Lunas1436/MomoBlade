@@ -40,11 +40,18 @@ void CObjSword::SwordAttack()
 // 剣先の座標を計算
 void CObjSword::CalcSwordTipXY(float* pfx, float* pfy)
 {
-    float fTipX = m_fx + m_dSwordLength * cos(m_dSwordAngle);
-    float fTipY = m_fy + m_nHeight + m_dSwordLength * sin(m_dSwordAngle);
+    //float fTipX = m_fx + m_dSwordLength * cos(m_dSwordAngle);
+    //float fTipY = m_fy + m_nHeight + m_dSwordLength * sin(m_dSwordAngle);
 
-    *pfx = fTipX;
-    *pfy = fTipY;
+    //*pfx = fTipX;
+    //*pfy = fTipY;
+
+    float dx = m_nWidth;
+    float dy = -m_nHeight;
+    float rx = dx * cos(m_dSwordAngle) - dy * sin(m_dSwordAngle);
+    float ry = dx * sin(m_dSwordAngle) + dy * cos(m_dSwordAngle);
+    *pfx = m_fx + rx;
+    *pfy = m_fy + m_nHeight + ry;
 }
 
 bool CObjSword::IsAttack()

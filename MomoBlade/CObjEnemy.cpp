@@ -73,9 +73,8 @@ void CObjEnemy::Draw(int nCameraX)
 
 bool CObjEnemy::IsPointInRect(float fx, float fy, int nCameraX)
 {
-	if ((int)fx >= m_fx - nCameraX && (int)fx <= m_fx - nCameraX + m_nWidth) {
-		int aaa = 100;
-		if ((int)fy >= m_fy && (int)fy <= m_fy + m_nHeight) {
+	if (fx >= m_fx - nCameraX && fx <= m_fx - nCameraX + m_nWidth) {
+		if (m_fy <= fy && fy <= m_fy + m_nHeight) {
 			return true;
 		}
 	}

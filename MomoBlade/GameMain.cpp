@@ -201,8 +201,8 @@ void GameClear()
 void GameOver()
 {
     pchText = "GAME OVER";
-    int nTextX = SCREEN_WIDTH / 2 - nTextWidth;
-    DrawStringToHandle(nTextX, SCREEN_HEIGHT / 2 - -nTextHeight / 2, pchText, GetColor(255, 0, 0), nTextFont);
+    int nTextX = SCREEN_WIDTH / 2 - nTextWidth / 2;
+    DrawStringToHandle(nTextX, SCREEN_HEIGHT / 2 - nTextHeight / 2, pchText, GetColor(255, 0, 0), nTextFont);
 }
 
 // 各オブジェクトの情報を外部のパラメータファイルで持つようにする
@@ -224,13 +224,23 @@ void InitGamePlay()
     ObjUnderGround.SetY(nGroundY + ObjUnderGround.GetHeight());
 
     // ブロック
-    ObjBlock.SetParameter(500, nGroundY - 150, 0, 0, "Image/Stage/Block.png");
-    ObjBlockList.push_back(ObjBlock);
+    // ブロック（ステージ風に複数配置）
+    ObjBlock.SetParameter(0, 0, 0, 0, "Image/Stage/Block.png");
 
-    CObject Block = ObjBlockList[0];
-    Block.SetX(1300);
-    Block.SetY(nGroundY - 150);
-    ObjBlockList.push_back(Block);
+    // 地面近くの足場
+    CObject b;
+    b = ObjBlock; b.SetX(500);  b.SetY(nGroundY - 150); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(800);  b.SetY(nGroundY - 150); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(1100); b.SetY(nGroundY - 150); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(1300); b.SetY(nGroundY - 150); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(1700); b.SetY(nGroundY - 150); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(2000); b.SetY(nGroundY - 150); ObjBlockList.push_back(b);
+
+    // 浮遊プラットフォーム（ジャンプで到達できる）
+    b = ObjBlock; b.SetX(900);  b.SetY(nGroundY - 250); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(1400); b.SetY(nGroundY - 300); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(2100); b.SetY(nGroundY - 220); ObjBlockList.push_back(b);
+    b = ObjBlock; b.SetX(2400); b.SetY(nGroundY - 270); ObjBlockList.push_back(b);
 
     // ゴールフラッグ
     ObjGoalFlag.SetParameter(STAGE_WIDTH - 200, 0.0f, 0.0f, 0.0f, "Image/Stage/GoalFlag.png");
@@ -386,17 +396,9 @@ void DrawMomo()
         if (!ObjMomo.IsOnGround()) { // 地面以外のオブジェクト上にいる
             if (m_nOnIndex >= 0 && !ObjMomo.IsMomoInRangeObjectX(ObjBlockList[m_nOnIndex])) { // オブジェクトのX範囲外に出たとき
                 m_nOnIndex = -1;
-                for (int i = 0; i < ObjBlockList.size(); i++) {
-                    if (ObjMomo.IsMomoInRangeObjectX(ObjBlockList[i])) {
-                        // 他のオブジェクトのX範囲内に入ったとき
-                        m_nOnIndex = i; 
-                    }
-                }
-                if (m_nOnIndex < 0) { // 範囲外の空中に出たとき
-                    ObjMomo.SetOnLand(false);
-                    ObjMomo.SetOnGround(false);
-                    ObjMomo.SetDestY(ObjGround.GetY());
-                }
+                ObjMomo.SetOnLand(false);
+                ObjMomo.SetOnGround(false);
+                ObjMomo.SetDestY(nGroundY);
             }
         }
     }
@@ -411,9 +413,8 @@ void DrawMomo()
         // ジャンプDOWN
         if (ObjMomo.GetVy() > 0) { // 着地判定
             // まず地面の上にいるか判定
-            if (fPrevBottom <= ObjGround.GetY() && ObjGround.GetY() <= fNextBottom) {
-                //ObjMomo.SetY(ObjGround.GetY() - ObjMomo.GetHeight());
-                fNextTop = ObjGround.GetY() - ObjMomo.GetHeight();
+            if (fPrevBottom <= nGroundY && nGroundY <= fNextBottom) {
+                fNextTop = nGroundY - ObjMomo.GetHeight();
                 ObjMomo.SetOnLand(true);
                 ObjMomo.SetOnGround(true);
                 ObjMomo.SetVy(0.0f);
@@ -441,7 +442,7 @@ void DrawMomo()
             if (fPrevTop >= 0 && fNextTop < 0) {
                 //ObjMomo.SetY(0.0f);
                 fNextTop = 0.0f;
-                ObjMomo.SetDestY(ObjGround.GetY());
+                ObjMomo.SetDestY(nGroundY);
             }
             else {
                 // オブジェクトにモモの頭が直撃するか判定
@@ -461,7 +462,7 @@ void DrawMomo()
                     float fDestY = ObjMomo.GetDestY();
                     if (fDestY <= fPrevTop && fNextTop <= fDestY) { // 最高点までジャンプした
                         fNextTop = fDestY;
-                        ObjMomo.SetDestY(ObjGround.GetY());
+                        ObjMomo.SetDestY(nGroundY);
                     }
                 }
 
