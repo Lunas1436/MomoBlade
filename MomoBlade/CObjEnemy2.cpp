@@ -1,5 +1,6 @@
 #include "CObjEnemy2.h"
 
+
 CObjEnemy2::CObjEnemy2()
 {
 }
@@ -11,11 +12,16 @@ void CObjEnemy2::InitWeapon(const char* pchImg1, const char* pchImg2)
     m_ObjBow.SetX(m_fx - m_ObjBow.GetWidth() - 10);
     m_ObjBow.SetY(m_fy + m_nHeight / 2 - (m_ObjBow.GetHeight() / 2));
 
+    // とりあえずべた書き
+    m_nImgBowL = m_ObjBow.GetImg();
+    m_nImgBowR = LoadGraph("Image/Enemy/Bow_R.png");
+
     // 矢
     m_ObjArrow.SetParameter(0.0f, 0.0f, 3.0f, 3.0f, pchImg2);
     m_ObjArrow.SetX(m_ObjBow.GetX());
     m_ObjArrow.SetY(m_ObjBow.GetY() + (m_ObjBow.GetHeight() / 2.0) - (m_ObjArrow.GetHeight() / 2.0));
 }
+
 
 float CObjEnemy2::CalcAngle(float fx, float fy, float ex, float ey)
 {
@@ -42,22 +48,37 @@ void CObjEnemy2::Update(CObject* pTarget)
     m_dAngle = 0.0f;
 
     // モモがいる側を向く
+    float fTargetX = pTarget->GetX() + pTarget->GetWidth() / 2;
+    float fTargetY = pTarget->GetY() + pTarget->GetHeight() / 2;
+    if (m_fx >= fTargetX) {
+        SetDirection(DIRECTION_L);
+    }
+    else {
+        SetDirection(DIRECTION_R);
+    }
+
+    float fWeaponX;
+    if (m_nDirection == DIRECTION_L) { // 弓矢を左向きにする
+        fWeaponX = m_fx - m_ObjBow.GetWidth() - 10;
+        m_ObjBow.SetImg(m_nImgBowL);
+    }
+    else { // 弓矢を右向きにする
+        fWeaponX = m_fx + m_nWidth + 10;
+        m_ObjBow.SetImg(m_nImgBowR);
+    }
+
+    // 弓矢の向き変更
+    m_ObjBow.SetX(fWeaponX);
+    m_ObjArrow.SetX(fWeaponX);
+
+    // モモがいる角度を計算
+    m_dAngle = CalcAngle(fTargetX, fTargetY, m_ObjBow.GetX(), m_ObjBow.GetY());
+
     if (m_bDetect) {
-        float fTargetX = pTarget->GetX() + pTarget->GetWidth() / 2;
-        float fTargetY = pTarget->GetY() + pTarget->GetHeight() / 2;
-        if (m_fx >= fTargetX) {
-            SetDirection(DIRECTION_L);
-        }
-        else {
-            SetDirection(DIRECTION_R);
-        }
-
-        // モモがいる角度を計算
-        m_dAngle = CalcAngle(fTargetX, fTargetY, m_ObjBow.GetX(), m_ObjBow.GetY());
-
         // 矢を装填
         Loading(fTargetX, fTargetY);
     }
+    
 }
 
 // 矢を装填
@@ -118,11 +139,10 @@ void CObjEnemy2::Attack(CObject* pTarget)
 void CObjEnemy2::Draw(int nCameraX)
 {
 	CObjEnemy::Draw(nCameraX);
-    
+
     // 弓矢描画
     DrawRotaGraph(m_ObjBow.GetX() - nCameraX + m_ObjBow.GetWidth() / 2, m_ObjBow.GetY() + m_ObjBow.GetHeight() / 2, 1.0, m_dAngle, m_ObjBow.GetImg(), TRUE);
     DrawRotaGraph(m_ObjArrow.GetX() - nCameraX + m_ObjArrow.GetWidth() / 2, m_ObjArrow.GetY() + m_ObjArrow.GetHeight() / 2, 1.0, m_dAngle, m_ObjArrow.GetImg(), TRUE);
-    //DrawGraph(m_ObjArrow.GetX() - nCameraX, m_ObjArrow.GetY(), m_ObjArrow.GetImg(), TRUE);
 
     // 攻撃中なら矢を放つ
     for (int i = (int)m_Arrows.size() - 1; i >= 0; --i) {

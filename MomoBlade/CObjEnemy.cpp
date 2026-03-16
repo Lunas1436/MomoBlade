@@ -1,5 +1,6 @@
 #include "CObjEnemy.h"
 
+
 CObjEnemy::CObjEnemy()
 {
 	m_nDirection = DIRECTION_L;
@@ -12,7 +13,7 @@ CObjEnemy::CObjEnemy()
 }
 
 // 敵初期化
-void CObjEnemy::InitEnmey(float fRangeL, float fRangeR, float fDetectW, const char* pchImg)
+void CObjEnemy::InitEnemy(float fRangeL, float fRangeR, float fDetectW, const char* pchImg)
 {
 	m_fRangeL = fRangeL;
 	m_fRangeR = fRangeR;
@@ -72,11 +73,10 @@ void CObjEnemy::Draw(int nCameraX)
 
 bool CObjEnemy::IsPointInRect(float fx, float fy, int nCameraX)
 {
-	if (fx >= m_fx - nCameraX && fx <= m_fx - nCameraX + m_nWidth &&
-		fy >= m_fy && fy <= m_fy + m_nHeight) 
-	{
-		// 剣先の座標が敵矩形内にある場合は敵が攻撃を受けたとみなす
-		return true;
+	if (fx >= m_fx - nCameraX && fx <= m_fx - nCameraX + m_nWidth) {
+		if (m_fy <= fy && fy <= m_fy + m_nHeight) {
+			return true;
+		}
 	}
 
 	return false;

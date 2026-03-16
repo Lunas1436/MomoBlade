@@ -1,5 +1,4 @@
 #pragma once
-
 #include "DxLib.h"
 #include "CObject.h"
 #include "CObjMomo.h"
@@ -12,22 +11,6 @@
 using namespace std;
 
 // ステージ
-const int STAGE_WIDTH = 3000;
-const int STAGE_HEIGHT = 600;
-
-// スクリーン
-const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 600;
-
-// ゲームステート
-enum {
-	GAME_START, // ゲーム開始画面
-	GAME_PLAY,  // ゲームプレイ画面
-	GAME_OVER,   // ゲームオーバー画面
-};
-int nGameState = GAME_START;
-
-// ステージ
 CObject ObjSky;         // 空    
 CObject ObjGround;      // 地面
 CObject ObjUnderGround; // 地中
@@ -35,7 +18,8 @@ CObject ObjBlock;       // ブロック
 vector<CObject> ObjBlockList;    // ブロックリスト
 CObject ObjGoalFlag;    // ゴールフラッグ
 
-int nGroundY;
+int nGroundY;    // 地面のY座標
+int nBrokenGoal; // 破壊時のゴールフラッグ
 
 // BGM
 int nStageBGM; // ステージBGM
@@ -43,7 +27,7 @@ int nStageBGM; // ステージBGM
 // モモタロー
 CObjMomo ObjMomo;
 int nCameraX = 0; // モモを中心とするカメラのX座標
-int m_nOnIndex;
+int m_nOnIndex = -1;
 
 // 剣
 CObjSword ObjSword;
@@ -51,7 +35,14 @@ CObjSword ObjSword;
 // 敵
 vector<CObjEnemy*> m_ObjEnemyList;
 
-void InitData();
+void GameStart();
+void GamePlay();
+void GameClear();
+void GameOver();
+
+void InitGameString();
+void InitGamePlay();
+
 void DrawStage();
 void PlayerInput();
 

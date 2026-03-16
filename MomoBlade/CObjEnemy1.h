@@ -1,6 +1,7 @@
 #pragma once
 #include "CObjEnemy.h"
 
+
 class CObjEnemy1 : public CObjEnemy
 {
 public:
@@ -9,5 +10,5 @@ public:
 public:
 	void Update(CObject* pTarget) override;
 	void Attack(CObject* pTarget) override;
-	void Draw();
+
 };

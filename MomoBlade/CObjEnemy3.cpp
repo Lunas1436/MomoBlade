@@ -1,6 +1,7 @@
 
 #include "CObjEnemy3.h"
 
+
 // コンストラクタ
 CObjEnemy3::CObjEnemy3()
 {
@@ -110,14 +111,14 @@ void CObjEnemy3::SearchTarget()
 void CObjEnemy3::ReturnToPlace()
 {
 	if (m_fStartX >= m_fx) {
-		m_nDirection = DIRECTION_R;
 		m_fx += 3.0;
+		SetDirection(DIRECTION_R);
 		if (m_fx >= m_fStartX) {
 			m_bReturn = false;
 		}
 	}
 	else {
-		m_nDirection = DIRECTION_L;
+		SetDirection(DIRECTION_L);
 		m_fx -= 3.0;
 		if (m_fx <= m_fStartX) {
 			m_bReturn = false;
