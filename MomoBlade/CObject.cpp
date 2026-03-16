@@ -3,7 +3,8 @@
 // コンストラクタ
 CObject::CObject() 
 	: m_fx(0), m_fy(0), m_fvx(0), m_fvy(0),
-	m_nWidth(0), m_nHeight(0), m_bDamaged(false), m_nTimer(0)
+	m_nWidth(0), m_nHeight(0), m_bDamaged(false), m_nTimer(0), 
+	m_nCurrentImg(-1)
 {
 	m_nDirection = DIRECTION_L;
 	m_nImg_L = -1;

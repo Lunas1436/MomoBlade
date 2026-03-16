@@ -24,6 +24,8 @@ public:
 private:
 	CObject m_ObjBow;
 	CObject m_ObjArrow;
+	int m_nImgBowL, m_nImgBowR;
+	
 	struct ARROW {
 		float fx;
 		float fy;

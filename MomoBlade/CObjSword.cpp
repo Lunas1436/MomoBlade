@@ -16,7 +16,13 @@ void CObjSword::DrawSword()
     if (m_bAttack) {
         SwordAttack();
     }
-    DrawRotaGraph2(m_fx, m_fy + m_nHeight, 0, m_nHeight, 1.0, m_dSwordAngle, m_nCurrentImg, TRUE);
+
+    int cx = 0; // 回転の中心のX座標
+    if (m_nDirection == DIRECTION_L) {
+        cx = m_nHeight;
+        m_dSwordAngle *= -1;
+    }
+    DrawRotaGraph2(m_fx, m_fy + m_nHeight, cx, m_nHeight, 1.0, m_dSwordAngle, m_nCurrentImg, TRUE);
 }
 
 // 斬撃モーション

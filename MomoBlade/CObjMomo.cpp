@@ -4,7 +4,7 @@
 
 CObjMomo::CObjMomo()
     : m_bOnLand(false), m_bOnGround(false),
-    m_nHP(HP_MAX * 4),  
+    m_nHP(0),  
     m_bAttacking(false),
     m_nSwordTimer(0),   
     m_dSwordLength(0.0) 
@@ -58,7 +58,7 @@ void CObjMomo::DrawSword(int nCameraX)
     float fSwordX = m_fx - nCameraX + m_nWidth + 10;
     float fSwordY = m_fy - 20;
     if (m_nDirection == DIRECTION_L) {
-        fSwordX = m_fx - nCameraX - 40;
+        fSwordX = m_fx - nCameraX;
     }
 
     m_ObjSword.SetX(fSwordX);
